@@ -1,0 +1,29 @@
+# Backup files
+*.bak
+*backup*
+*_backup*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output / temp
+outputs/
+*.tmp
+*.log
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
