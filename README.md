@@ -11,7 +11,7 @@ PO PDF → Excel 입력, OOR Bring Forward 분석, 커미션 인보이스 생성
 
 ```bash
 # 마켓플레이스 추가
-/plugin marketplace add https://github.com/사용자/kostat-agent-plugin
+/plugin marketplace add https://github.com/hjh850718-byte/kostat-agent-plugin
 
 # 플러그인 설치
 /plugin install kostat-agent@kostat-agent
