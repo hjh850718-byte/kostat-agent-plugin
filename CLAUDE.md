@@ -19,7 +19,12 @@ kostat-agent-plugin/
 │   ├── kostat-memory-ticket/
 │   ├── kostat-skill-check/
 │   ├── kostat-memory-loader/
-│   └── kostat-tal/
+│   ├── kostat-tal/
+│   └── external/                 ← 외부 설치 스킬 4개
+│       ├── skill-creator/        ← 스킬 생성/개선/eval 메타 스킬
+│       ├── superpowers/          ← 4단계 RCA 체계적 디버깅
+│       ├── context-optimization/ ← 장기 세션 컨텍스트 최적화
+│       └── frontend-design/      ← 블로그/대시보드 UI 생성
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
 ├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
@@ -68,3 +73,21 @@ AUTOMATION/
 - `ORCHESTRATOR_ENGINE=claude`: Claude Code subprocess 실행 (fanout 모드)
 - `.env`에서 ENGINE 전환 가능
 - Task 타임아웃: 10분, 재시도: 1회, 동시 실행: 최대 4개
+
+## External Skills (외부 설치 스킬)
+
+| 스킬 | 경로 | 트리거 |
+|---|---|---|
+| skill-creator | skills/external/skill-creator/SKILL.md | 스킬 eval, 스킬 개선 |
+| superpowers-debugging | skills/external/superpowers/SKILL.md | 에러, 디버깅, 오류 |
+| context-optimization | skills/external/context-optimization/SKILL.md | 세션 느려, 토큰 절약 |
+| frontend-design | skills/external/frontend-design/SKILL.md | 웹페이지, 블로그 UI |
+
+### 외부 스킬 설치 경로 (Windows AGENT 워크스페이스)
+```
+C:\Users\USER\Documents\Claude\AGENT\.claude\skills\external\
+├── skill-creator\SKILL.md
+├── superpowers\SKILL.md
+├── context-optimization\SKILL.md
+└── frontend-design\SKILL.md
+```
