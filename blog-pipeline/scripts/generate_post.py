@@ -14,6 +14,7 @@ Claude API를 사용하여 Hugo 호환 마크다운 포스트를 생성한다.
 import os
 import re
 import sys
+import json
 import random
 import argparse
 import textwrap
@@ -53,6 +54,34 @@ TOPIC_POOL = [
     "CRM 없이 Excel로 해외 파이프라인 관리하는 실전 방법",
     "무역 보험(KSURE/KEXIM) 활용해 대금 미회수 위험 줄이는 법",
 ]
+
+
+USED_TOPICS_FILE = Path(__file__).parent.parent / "data" / "used_topics.json"
+
+
+def load_used_topics() -> list[str]:
+    if USED_TOPICS_FILE.exists():
+        return json.loads(USED_TOPICS_FILE.read_text(encoding="utf-8"))
+    return []
+
+
+def save_used_topic(topic: str) -> None:
+    used = load_used_topics()
+    if topic not in used:
+        used.append(topic)
+        USED_TOPICS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        USED_TOPICS_FILE.write_text(json.dumps(used, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def pick_topic() -> str:
+    """아직 사용하지 않은 주제를 랜덤 선택한다. 모두 소진되면 풀을 리셋한다."""
+    used = load_used_topics()
+    remaining = [t for t in TOPIC_POOL if t not in used]
+    if not remaining:
+        print("[주제 풀 리셋] 모든 주제를 사용했습니다. 처음부터 다시 시작합니다.", file=sys.stderr)
+        USED_TOPICS_FILE.write_text("[]", encoding="utf-8")
+        remaining = TOPIC_POOL[:]
+    return random.choice(remaining)
 
 
 def slugify(text: str) -> str:
@@ -170,8 +199,9 @@ def main():
         print("오류: ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다.", file=sys.stderr)
         sys.exit(1)
 
-    topic = args.topic or random.choice(TOPIC_POOL)
+    topic = args.topic or pick_topic()
     content, slug = generate_post(topic, args.lang)
+    save_used_topic(topic)
 
     output_dir = Path(args.output_dir)
     saved_path = save_post(content, slug, output_dir)

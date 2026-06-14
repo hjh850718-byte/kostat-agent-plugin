@@ -177,8 +177,20 @@ jobs:
             core.setOutput("pr_url", pr.html_url);
             core.setOutput("pr_number", pr.number);
 
-      # ── 7. 실패 시 이메일 알림 ──────────────────────────────────
-      - name: Notify on failure
+      # ── 7. 성공 시 카카오톡 알림 ────────────────────────────────
+      - name: Notify success via KakaoTalk
+        if: success()
+        env:
+          KAKAO_ACCESS_TOKEN: ${{ secrets.KAKAO_ACCESS_TOKEN }}
+        run: |
+          python scripts/notify_kakao.py \
+            --status success \
+            --pr-url "${{ steps.create_pr.outputs.pr_url }}" \
+            --title  "${{ steps.generate.outputs.POST_TOPIC }}" \
+            --score  "${{ steps.filter.outputs.filter_score }}"
+
+      # ── 8. 실패 시 이메일 + 카카오톡 알림 ──────────────────────
+      - name: Notify failure via email
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -198,6 +210,17 @@ jobs:
             실행 URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             원인을 확인하고 수동으로 재실행하세요.
+
+      - name: Notify failure via KakaoTalk
+        if: failure()
+        env:
+          KAKAO_ACCESS_TOKEN: ${{ secrets.KAKAO_ACCESS_TOKEN }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          python scripts/notify_kakao.py \
+            --status failure \
+            --run-url "$RUN_URL" \
+            --reason  "워크플로우 실패 — 로그를 확인하세요"
 
   # ── Hugo 빌드 + GitHub Pages 배포 (PR 머지 시 트리거) ──────────
   deploy:

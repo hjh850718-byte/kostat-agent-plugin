@@ -89,9 +89,17 @@ GitHub 저장소 → **Settings → Secrets and variables → Actions → New re
 | `ANTHROPIC_API_KEY` | `sk-ant-...` | Claude API 키 |
 | `NOTIFY_EMAIL` | `your@gmail.com` | 실패 알림 발신/수신 이메일 |
 | `NOTIFY_EMAIL_PASSWORD` | Gmail 앱 비밀번호 | [Google 앱 비밀번호 생성](https://myaccount.google.com/apppasswords) |
+| `KAKAO_ACCESS_TOKEN` | 카카오 OAuth 토큰 | 선택 — 없으면 카카오 알림 건너뜀 |
 
 > **Gmail 앱 비밀번호**: 2단계 인증 활성화 후 앱 비밀번호를 별도 생성해야 한다.
 > 일반 Gmail 비밀번호는 사용 불가.
+
+> **KAKAO_ACCESS_TOKEN 발급 방법**
+> 1. [카카오 개발자 콘솔](https://developers.kakao.com) → 내 애플리케이션 생성
+> 2. 카카오 로그인 → 동의항목 → "카카오톡 메시지 전송" 활성화
+> 3. Redirect URI: `https://example.com` (테스트용)
+> 4. [인가 코드 받기 → 액세스 토큰 발급](https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api)
+> 5. 발급된 `access_token`을 Secret에 등록
 
 ---
 
