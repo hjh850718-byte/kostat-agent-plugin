@@ -1,0 +1,232 @@
+name: Daily Blog Post
+
+# 매일 오전 7시 KST (= UTC 22:00 전날)에 자동 실행
+# 수동 실행도 가능 (workflow_dispatch)
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "포스트 주제 (비워두면 랜덤 선택)"
+        required: false
+        default: ""
+      lang:
+        description: "언어 설정"
+        required: false
+        default: "both"
+        type: choice
+        options:
+          - both
+          - ko
+          - en
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-and-pr:
+    name: 포스트 생성 → Draft PR 생성
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. 저장소 체크아웃 ──────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Python 환경 설정 ─────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install anthropic
+
+      # ── 3. Claude API로 초안 생성 ───────────────────────────────
+      - name: Generate draft post
+        id: generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TOPIC="${{ github.event.inputs.topic }}"
+          LANG="${{ github.event.inputs.lang }}"
+          LANG="${LANG:-both}"
+
+          if [ -z "$TOPIC" ]; then
+            OUTPUT=$(python scripts/generate_post.py --lang "$LANG" --output-dir content/posts)
+          else
+            OUTPUT=$(python scripts/generate_post.py --topic "$TOPIC" --lang "$LANG" --output-dir content/posts)
+          fi
+
+          # 출력에서 변수 추출
+          echo "$OUTPUT" | grep -E "^(POST_PATH|POST_SLUG|POST_TOPIC)=" >> $GITHUB_OUTPUT
+          echo "Generated output:"
+          echo "$OUTPUT"
+
+      # ── 4. AdSense 키워드 필터 검사 ─────────────────────────────
+      - name: Run keyword safety filter
+        id: filter
+        run: |
+          POST_PATH="${{ steps.generate.outputs.POST_PATH }}"
+
+          if [ -z "$POST_PATH" ]; then
+            echo "오류: POST_PATH가 비어있습니다." >&2
+            exit 1
+          fi
+
+          FILTER_OUTPUT=$(python scripts/keyword_filter.py "$POST_PATH" --json 2>&1)
+          PASSED=$(echo "$FILTER_OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['passed'])" 2>/dev/null || echo "False")
+          SCORE=$(echo "$FILTER_OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['score'])" 2>/dev/null || echo "0")
+
+          echo "filter_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "filter_score=$SCORE" >> $GITHUB_OUTPUT
+          echo "필터 결과: passed=$PASSED score=$SCORE"
+
+          # 필터 실패 시 워크플로우 중단
+          if [ "$PASSED" != "True" ]; then
+            echo "::error::AdSense 키워드 필터 실패 — 포스트 초안을 검토하세요."
+            exit 1
+          fi
+
+      # ── 5. 새 브랜치 생성 및 파일 커밋 ─────────────────────────
+      - name: Commit draft post to new branch
+        id: commit
+        run: |
+          SLUG="${{ steps.generate.outputs.POST_SLUG }}"
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="draft/post-${DATE}-${SLUG}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add content/posts/
+          git commit -m "draft: auto-generated post ${DATE} — ${SLUG}"
+          git push origin "$BRANCH"
+
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "date=$DATE"     >> $GITHUB_OUTPUT
+
+      # ── 6. Draft PR 자동 생성 ───────────────────────────────────
+      - name: Create draft pull request
+        id: create_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch  = "${{ steps.commit.outputs.branch }}";
+            const slug    = "${{ steps.generate.outputs.POST_SLUG }}";
+            const topic   = "${{ steps.generate.outputs.POST_TOPIC }}";
+            const score   = "${{ steps.filter.outputs.filter_score }}";
+            const date    = new Date().toLocaleDateString("ko-KR", {timeZone: "Asia/Seoul"});
+
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `[초안검토] ${topic}`,
+              head:  branch,
+              base:  "main",
+              draft: true,
+              body: [
+                "## 📝 자동 생성 블로그 포스트 초안",
+                "",
+                `- **주제**: ${topic}`,
+                `- **생성일**: ${date}`,
+                `- **AdSense 안전도**: ${score}/100`,
+                `- **파일**: \`content/posts/${date}-${slug}.md\`",`,
+                "",
+                "## 검수 체크리스트",
+                "- [ ] 사실 관계 확인",
+                "- [ ] 문체·톤 검토",
+                "- [ ] 이미지/캡션 추가 (선택)",
+                "- [ ] SEO 제목/설명 최종 확인",
+                "- [ ] AdSense 정책 이상 없음",
+                "",
+                "> 이 PR을 **main으로 머지**하면 Hugo 빌드 + GitHub Pages 배포가 자동 실행됩니다.",
+              ].join("\n"),
+            });
+
+            // "draft-review" 라벨 부착
+            try {
+              await github.rest.issues.addLabels({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                issue_number: pr.number,
+                labels:      ["draft-review"],
+              });
+            } catch (e) {
+              // 라벨이 없으면 먼저 생성
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                name:  "draft-review",
+                color: "fbca04",
+                description: "자동 생성 초안 — 검수 필요",
+              });
+              await github.rest.issues.addLabels({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                issue_number: pr.number,
+                labels:      ["draft-review"],
+              });
+            }
+
+            console.log(`PR created: ${pr.html_url}`);
+            core.setOutput("pr_url", pr.html_url);
+            core.setOutput("pr_number", pr.number);
+
+      # ── 7. 실패 시 이메일 알림 ──────────────────────────────────
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.NOTIFY_EMAIL }}
+          password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+          subject: "[Korea-Asia Blog] 자동 포스팅 실패 — ${{ github.run_id }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: "Blog Bot <${{ secrets.NOTIFY_EMAIL }}>"
+          body: |
+            GitHub Actions 자동 포스팅이 실패했습니다.
+
+            워크플로우: ${{ github.workflow }}
+            실행 ID: ${{ github.run_id }}
+            실행 URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            원인을 확인하고 수동으로 재실행하세요.
+
+  # ── Hugo 빌드 + GitHub Pages 배포 (PR 머지 시 트리거) ──────────
+  deploy:
+    name: Hugo 빌드 → GitHub Pages 배포
+    runs-on: ubuntu-latest
+    # main 브랜치 push(= PR 머지)일 때만 실행
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Hugo 테마를 서브모듈로 사용할 경우
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "latest"
+          extended: true  # SCSS 지원 Extended 버전
+
+      - name: Build Hugo site
+        run: hugo --minify --baseURL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          commit_message: "deploy: ${{ github.event.head_commit.message }}"
