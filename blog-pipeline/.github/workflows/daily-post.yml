@@ -45,7 +45,7 @@ jobs:
           cache: "pip"
 
       - name: Install Python dependencies
-        run: pip install anthropic
+        run: pip install -r requirements.txt
 
       # ── 3. Claude API로 초안 생성 ───────────────────────────────
       - name: Generate draft post
@@ -57,16 +57,14 @@ jobs:
           LANG="${{ github.event.inputs.lang }}"
           LANG="${LANG:-both}"
 
+          # stderr(진행 로그)는 터미널에, stdout(KEY=VALUE)만 캡처
           if [ -z "$TOPIC" ]; then
-            OUTPUT=$(python scripts/generate_post.py --lang "$LANG" --output-dir content/posts)
+            python scripts/generate_post.py --lang "$LANG" --output-dir content/posts \
+              | grep -E "^(POST_PATH|POST_SLUG|POST_TOPIC)=" | tee -a "$GITHUB_OUTPUT"
           else
-            OUTPUT=$(python scripts/generate_post.py --topic "$TOPIC" --lang "$LANG" --output-dir content/posts)
+            python scripts/generate_post.py --topic "$TOPIC" --lang "$LANG" --output-dir content/posts \
+              | grep -E "^(POST_PATH|POST_SLUG|POST_TOPIC)=" | tee -a "$GITHUB_OUTPUT"
           fi
-
-          # 출력에서 변수 추출
-          echo "$OUTPUT" | grep -E "^(POST_PATH|POST_SLUG|POST_TOPIC)=" >> $GITHUB_OUTPUT
-          echo "Generated output:"
-          echo "$OUTPUT"
 
       # ── 4. AdSense 키워드 필터 검사 ─────────────────────────────
       - name: Run keyword safety filter
