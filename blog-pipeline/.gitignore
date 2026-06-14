@@ -1,0 +1,26 @@
+# Hugo 빌드 결과물
+public/
+resources/_gen/
+
+# Hugo 임시 파일
+.hugo_build.lock
+
+# 테마 (서브모듈로 관리)
+themes/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 에디터
+.vscode/
+.idea/
+*.swp
