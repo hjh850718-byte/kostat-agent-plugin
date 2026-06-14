@@ -20,9 +20,15 @@ kostat-agent-plugin/
 │   ├── kostat-skill-check/
 │   ├── kostat-memory-loader/
 │   └── kostat-tal/
+├── agents/                       ← 서브에이전트 (위임 전용)
+│   └── kostat-reviewer.md        ← PO·OOR·커미션 2차 검토 (VFF 기반)
+├── output-styles/                ← Output Style 정의
+│   └── kostat-vff.md             ← KOSTAT 해외영업 VFF 스타일 (/config에서 활성화)
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
-├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
+├── hooks/                        ← Hook Python/Bash 스크립트 + hooks.json
+│   ├── kostat-reminder.sh        ← 장기세션 검증 리마인더 (600KB 초과 시 주입)
+│   └── (기존 Python 스크립트 9개)
 ├── docs/                         ← 참고 자료 (설계 문서 등)
 ├── CLAUDE.md                     ← 이 파일
 ├── package.json                  ← 버전/의존성
