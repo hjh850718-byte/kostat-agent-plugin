@@ -42,6 +42,13 @@
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
         "timeout": 5
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "description": "장기 세션 KOSTAT 검증 리마인더 (600KB 초과 + 스킬 활성 시)",
+        "command": "bash \"{{PLUGIN_DIR}}/hooks/kostat-reminder.sh\"",
+        "timeout": 10
+      }
     ]
   }
 }
