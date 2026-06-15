@@ -3,9 +3,11 @@
 카카오톡 알림 전송 스크립트
 KakaoTalk Notify API (kakao.com/link/v2/memo/default/send) 사용
 
-환경변수:
-  KAKAO_ACCESS_TOKEN  - 카카오 OAuth 액세스 토큰
-  KAKAO_REFRESH_TOKEN - 리프레시 토큰 (선택, 토큰 갱신 시 사용)
+환경변수 (GitHub Secrets):
+  KAKAO_ACCESS_TOKEN  - 카카오 OAuth 액세스 토큰 (6시간 유효, 필수)
+  KAKAO_CLIENT_ID     - REST API 키 (자동 갱신 시 필요)
+  KAKAO_CLIENT_SECRET - Client Secret (앱 설정에서 활성화한 경우 필요)
+  KAKAO_REFRESH_TOKEN - refresh_token (60일 유효, 자동 갱신에 사용)
 
 사용법:
   python scripts/notify_kakao.py --status success --pr-url URL --title "포스트 제목"
@@ -34,25 +36,41 @@ def _load_saved_tokens() -> dict:
     return {}
 
 
-def refresh_token(refresh_token_val: str, client_id: str) -> str | None:
-    """만료된 access_token을 refresh_token으로 갱신한다."""
-    data = urllib.parse.urlencode({
+def _do_refresh(client_id: str, refresh_token_val: str, client_secret: str = "") -> str | None:
+    """refresh_token으로 새 access_token을 발급받는다. Client Secret 지원."""
+    import time
+    payload = {
         "grant_type":    "refresh_token",
         "client_id":     client_id,
         "refresh_token": refresh_token_val,
-    }).encode()
-    req = urllib.request.Request(TOKEN_URL, data=data, method="POST")
+    }
+    if client_secret:
+        payload["client_secret"] = client_secret
+
+    data = urllib.parse.urlencode(payload).encode()
+    req = urllib.request.Request(
+        TOKEN_URL,
+        data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded;charset=utf-8"},
+        method="POST",
+    )
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             result = json.loads(resp.read())
             new_token = result.get("access_token")
-            # 갱신된 토큰을 로컬 파일에도 저장
             if new_token and TOKEN_FILE.exists():
                 saved = _load_saved_tokens()
                 saved["access_token"] = new_token
+                saved["access_token_expires"] = int(time.time()) + result.get("expires_in", 21600)
+                # refresh_token 잔여 < 30일이면 새 refresh_token도 응답에 포함됨
                 if result.get("refresh_token"):
                     saved["refresh_token"] = result["refresh_token"]
-                TOKEN_FILE.write_text(json.dumps(saved, ensure_ascii=False, indent=2))
+                    saved["refresh_token_expires"] = int(time.time()) + result.get(
+                        "refresh_token_expires_in", 5_184_000
+                    )
+                TOKEN_FILE.write_text(
+                    json.dumps(saved, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
             return new_token
     except Exception:
         return None
@@ -60,29 +78,54 @@ def refresh_token(refresh_token_val: str, client_id: str) -> str | None:
 
 def resolve_access_token() -> str:
     """
-    환경변수 KAKAO_ACCESS_TOKEN 우선 사용.
-    없으면 .kakao_tokens.json에서 읽고, 만료 시 자동 갱신 시도.
+    토큰 우선순위:
+      1. 환경변수 KAKAO_ACCESS_TOKEN
+      2. .kakao_tokens.json (만료 감지 시 자동 갱신)
+    자동 갱신에는 KAKAO_CLIENT_ID / KAKAO_REFRESH_TOKEN 환경변수 또는
+    .kakao_tokens.json에 저장된 값을 사용한다.
     """
     token = os.environ.get("KAKAO_ACCESS_TOKEN", "").strip()
-    if token:
-        return token
+    client_id      = os.environ.get("KAKAO_CLIENT_ID", "").strip()
+    refresh_tok    = os.environ.get("KAKAO_REFRESH_TOKEN", "").strip()
+    client_secret  = os.environ.get("KAKAO_CLIENT_SECRET", "").strip()
 
+    # 환경변수 토큰 유효성 확인 → 만료 시 갱신
+    if token:
+        req = urllib.request.Request(
+            "https://kapi.kakao.com/v1/user/access_token_info",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        try:
+            urllib.request.urlopen(req, timeout=5)
+            return token  # 유효
+        except urllib.error.HTTPError as e:
+            if e.code == 401 and client_id and refresh_tok:
+                new = _do_refresh(client_id, refresh_tok, client_secret)
+                return new or token  # 갱신 실패 시 원본 토큰으로 재시도
+        except Exception:
+            return token  # 네트워크 오류 시 그냥 사용
+
+    # 로컬 파일에서 토큰 로드
     saved = _load_saved_tokens()
     token = saved.get("access_token", "")
     if not token:
         return ""
 
-    # 토큰 유효성 빠른 확인 (401이면 refresh)
+    # 만료 시 refresh
     req = urllib.request.Request(
         "https://kapi.kakao.com/v1/user/access_token_info",
         headers={"Authorization": f"Bearer {token}"},
     )
     try:
         urllib.request.urlopen(req, timeout=5)
-        return token  # 유효
+        return token
     except urllib.error.HTTPError as e:
         if e.code == 401 and saved.get("refresh_token") and saved.get("client_id"):
-            new = refresh_token(saved["refresh_token"], saved["client_id"])
+            new = _do_refresh(
+                saved["client_id"],
+                saved["refresh_token"],
+                saved.get("client_secret", ""),
+            )
             return new or ""
     except Exception:
         pass
