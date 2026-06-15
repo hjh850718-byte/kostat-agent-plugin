@@ -20,6 +20,9 @@ venv/
 .DS_Store
 Thumbs.db
 
+# 카카오 토큰 (절대 커밋 금지)
+.kakao_tokens.json
+
 # 에디터
 .vscode/
 .idea/

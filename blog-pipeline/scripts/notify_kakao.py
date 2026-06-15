@@ -19,27 +19,74 @@ import argparse
 import urllib.request
 import urllib.parse
 import urllib.error
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 KST = timezone(timedelta(hours=9))
-KAKAO_API_URL = "https://kapi.kakao.com/v2/api/talk/memo/default/send"
-KAKAO_REFRESH_URL = "https://kauth.kakao.com/oauth/token"
+KAKAO_API_URL    = "https://kapi.kakao.com/v2/api/talk/memo/default/send"
+TOKEN_URL        = "https://kauth.kakao.com/oauth/token"
+TOKEN_FILE       = Path(__file__).parent.parent / ".kakao_tokens.json"
+
+
+def _load_saved_tokens() -> dict:
+    if TOKEN_FILE.exists():
+        return json.loads(TOKEN_FILE.read_text(encoding="utf-8"))
+    return {}
 
 
 def refresh_token(refresh_token_val: str, client_id: str) -> str | None:
-    """액세스 토큰을 리프레시한다."""
+    """만료된 access_token을 refresh_token으로 갱신한다."""
     data = urllib.parse.urlencode({
-        "grant_type": "refresh_token",
-        "client_id": client_id,
+        "grant_type":    "refresh_token",
+        "client_id":     client_id,
         "refresh_token": refresh_token_val,
     }).encode()
-    req = urllib.request.Request(KAKAO_REFRESH_URL, data=data, method="POST")
+    req = urllib.request.Request(TOKEN_URL, data=data, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             result = json.loads(resp.read())
-            return result.get("access_token")
+            new_token = result.get("access_token")
+            # 갱신된 토큰을 로컬 파일에도 저장
+            if new_token and TOKEN_FILE.exists():
+                saved = _load_saved_tokens()
+                saved["access_token"] = new_token
+                if result.get("refresh_token"):
+                    saved["refresh_token"] = result["refresh_token"]
+                TOKEN_FILE.write_text(json.dumps(saved, ensure_ascii=False, indent=2))
+            return new_token
     except Exception:
         return None
+
+
+def resolve_access_token() -> str:
+    """
+    환경변수 KAKAO_ACCESS_TOKEN 우선 사용.
+    없으면 .kakao_tokens.json에서 읽고, 만료 시 자동 갱신 시도.
+    """
+    token = os.environ.get("KAKAO_ACCESS_TOKEN", "").strip()
+    if token:
+        return token
+
+    saved = _load_saved_tokens()
+    token = saved.get("access_token", "")
+    if not token:
+        return ""
+
+    # 토큰 유효성 빠른 확인 (401이면 refresh)
+    req = urllib.request.Request(
+        "https://kapi.kakao.com/v1/user/access_token_info",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    try:
+        urllib.request.urlopen(req, timeout=5)
+        return token  # 유효
+    except urllib.error.HTTPError as e:
+        if e.code == 401 and saved.get("refresh_token") and saved.get("client_id"):
+            new = refresh_token(saved["refresh_token"], saved["client_id"])
+            return new or ""
+    except Exception:
+        pass
+    return token
 
 
 def send_kakao_message(access_token: str, template: dict) -> bool:
@@ -121,7 +168,7 @@ def main():
     parser.add_argument("--reason",   default="알 수 없는 오류", help="실패 원인")
     args = parser.parse_args()
 
-    access_token = os.environ.get("KAKAO_ACCESS_TOKEN", "")
+    access_token = resolve_access_token()
     if not access_token:
         print("[경고] KAKAO_ACCESS_TOKEN이 없습니다. 알림을 건너뜁니다.", file=sys.stderr)
         sys.exit(0)  # 토큰 없어도 워크플로우 실패로 이어지지 않도록 0 종료
