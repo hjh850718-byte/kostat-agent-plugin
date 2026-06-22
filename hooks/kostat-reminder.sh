@@ -17,7 +17,9 @@ size=$(wc -c < "$tp" 2>/dev/null | tr -d ' ')
 
 style_on=0
 cwd=$(printf '%s' "$input" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
-for f in "$HOME/.claude/settings.json" "$cwd/.claude/settings.local.json" "$cwd/.claude/settings.json"; do
+settings_paths="$HOME/.claude/settings.json"
+[ -n "$cwd" ] && settings_paths="$settings_paths $cwd/.claude/settings.local.json $cwd/.claude/settings.json"
+for f in $settings_paths; do
   [ -f "$f" ] && grep -qsiE '"outputStyle"[[:space:]]*:[[:space:]]*"(kostat-agent:)?kostat-vff"' "$f" && style_on=1 && break
 done
 
