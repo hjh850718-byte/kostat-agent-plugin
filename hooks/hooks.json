@@ -5,12 +5,12 @@
       "Write|Edit": [
         {
           "description": "Human Gate 승인 확인",
-          "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-gateguard.py\"",
+          "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-gateguard.py\"",
           "timeout": 5
         },
         {
           "description": "수정 전 자동 백업",
-          "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-autobackup.py\"",
+          "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-autobackup.py\"",
           "timeout": 5
         }
       ]
@@ -19,12 +19,12 @@
       "Write|Edit": [
         {
           "description": "변경 사항 관찰 로깅",
-          "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-observe.py\"",
+          "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-observe.py\"",
           "timeout": 10
         },
         {
           "description": "Trace Log 기록",
-          "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-tracelogger.py\"",
+          "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-tracelogger.py\"",
           "timeout": 5
         }
       ]
@@ -32,33 +32,33 @@
     "UserPromptSubmit": [
       {
         "description": "업무종료 키워드 실시간 감지 → EOD flag 기록",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-detector.py\"",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-eod-detector.py\"",
         "timeout": 5
       },
       {
         "description": "프롬프트 분석 → workspace + Skill 추천",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-workspace-router.py\"",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-workspace-router.py\"",
         "timeout": 5
       }
     ],
     "PreCompact": [
       {
         "description": "/compact 직전 상태 compaction-log.txt에 저장",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-compact.py\"",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-compact.py\"",
         "timeout": 5
       }
     ],
     "SessionStart": [
       {
         "description": "EOD 재접속 감지 (6시 이후 회고 제안)",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-sessionstart.py\"",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-eod-sessionstart.py\"",
         "timeout": 5
       }
     ],
     "Stop": [
       {
         "description": "EOD 세션 로깅 + pending_retro flag",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
+        "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/kostat-eod-stop.py\"",
         "timeout": 5
       }
     ]
