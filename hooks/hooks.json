@@ -29,6 +29,25 @@
         }
       ]
     },
+    "UserPromptSubmit": [
+      {
+        "description": "업무종료 키워드 실시간 감지 → EOD flag 기록",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-detector.py\"",
+        "timeout": 5
+      },
+      {
+        "description": "프롬프트 분석 → workspace + Skill 추천",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-workspace-router.py\"",
+        "timeout": 5
+      }
+    ],
+    "PreCompact": [
+      {
+        "description": "/compact 직전 상태 compaction-log.txt에 저장",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-compact.py\"",
+        "timeout": 5
+      }
+    ],
     "SessionStart": [
       {
         "description": "EOD 재접속 감지 (6시 이후 회고 제안)",

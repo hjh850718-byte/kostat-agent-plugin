@@ -1,7 +1,7 @@
 {
   "name": "kostat-agent",
   "description": "KOSTAT 해외영업 자동화 — PO 업데이트, OOR 분석, 커미션 인보이스, EOD 회고, 아침 브리핑, 무역 업무 지원",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "author": {
     "name": "한준희",
     "email": ""
