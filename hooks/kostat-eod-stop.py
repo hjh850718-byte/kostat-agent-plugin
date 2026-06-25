@@ -114,7 +114,7 @@ def main():
     if eod:
         clear_pending_retro()
         trigger = flag_data.get("trigger_type", "unknown") if flag_data else "transcript"
-        entry = f"[{timestamp}] ✅ EOD 감지 ({trigger_type}) — 회고 대상 세션\n"
+        entry = f"[{timestamp}] ✅ EOD 감지 ({trigger}) — 회고 대상 세션\n"
     else:
         # 6시 이후 미감지 → pending_retro 기록 (재접속 시 알림)
         write_pending_retro()
