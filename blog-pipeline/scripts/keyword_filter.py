@@ -117,16 +117,18 @@ def main():
         sys.exit(2)
 
     result = check_file(file_path)
-    print(result.summary())
 
-    # GitHub Actions에서 결과를 JSON으로 출력
     if "--json" in sys.argv:
+        # JSON 모드: stdout에는 JSON만, 사람이 읽는 요약은 stderr로
+        print(result.summary(), file=sys.stderr)
         print(json.dumps({
             "passed": result.passed,
             "score": result.score,
             "violations": result.violations,
             "cautions": result.cautions,
         }, ensure_ascii=False, indent=2))
+    else:
+        print(result.summary())
 
     sys.exit(0 if result.passed else 1)
 
