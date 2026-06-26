@@ -26,10 +26,20 @@
           "description": "Trace Log 기록",
           "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-tracelogger.py\"",
           "timeout": 5
+        },
+        {
+          "description": "에이전트 핸드오프 파일 기록 (.ai-bridge/agent-handoffs/)",
+          "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-handoff-writer.py\"",
+          "timeout": 5
         }
       ]
     },
     "SessionStart": [
+      {
+        "description": ".ai-bridge/ 디렉토리 초기화 (current-plan, task-status, session-context)",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-ai-bridge.py\"",
+        "timeout": 5
+      },
       {
         "description": "EOD 재접속 감지 (6시 이후 회고 제안)",
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-sessionstart.py\"",
@@ -37,6 +47,11 @@
       }
     ],
     "Stop": [
+      {
+        "description": ".ai-bridge/ 세션 종료 시각 기록",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-ai-bridge.py\"",
+        "timeout": 5
+      },
       {
         "description": "EOD 세션 로깅 + pending_retro flag",
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
