@@ -1,8 +1,8 @@
 {
   "name": "kostat-agent",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
-  "description": "KOSTAT 해외영업 자동화 Plugin — PO 업데이트, OOR 분석, 커미션 인보이스, EOD 회고",
+  "description": "KOSTAT 해외영업 자동화 Plugin — PO 업데이트, OOR 분석, 커미션 인보이스, EOD 회고 + 하네스 메타 스킬",
   "scripts": {
     "setup": "node scripts/setup.js",
     "version": "echo 1.0.0"
