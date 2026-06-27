@@ -1,0 +1,121 @@
+name: PR Draft Review Check
+
+# draft-review 라벨이 붙은 PR이 열리거나 동기화될 때 실행
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  keyword-filter:
+    name: AdSense 키워드 필터 검사
+    runs-on: ubuntu-latest
+    # draft-review 라벨이 있는 PR만 검사
+    if: contains(github.event.pull_request.labels.*.name, 'draft-review')
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Find new post file
+        id: find_post
+        run: |
+          # PR에서 추가된 마크다운 파일 찾기
+          git fetch origin main
+          CHANGED=$(git diff --name-only origin/main...HEAD -- 'content/posts/*.md' | head -1)
+          echo "post_file=$CHANGED" >> $GITHUB_OUTPUT
+          echo "찾은 포스트: $CHANGED"
+
+      - name: Run keyword filter
+        id: filter
+        if: steps.find_post.outputs.post_file != ''
+        run: |
+          FILE="${{ steps.find_post.outputs.post_file }}"
+          RESULT=$(python scripts/keyword_filter.py "$FILE" --json 2>&1)
+          PASSED=$(echo "$RESULT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['passed'])" 2>/dev/null || echo "False")
+          SCORE=$(echo  "$RESULT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['score'])"  2>/dev/null || echo "0")
+          VIOLATIONS=$(echo "$RESULT" | python -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          lines = [f\"- [{v['category']}] '{v['keyword']}'\" for v in d['violations']]
+          print('\n'.join(lines) if lines else '없음')
+          " 2>/dev/null || echo "확인 불가")
+          CAUTIONS=$(echo "$RESULT" | python -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          print(', '.join(d['cautions']) if d['cautions'] else '없음')
+          " 2>/dev/null || echo "확인 불가")
+
+          echo "filter_passed=$PASSED"    >> $GITHUB_OUTPUT
+          echo "filter_score=$SCORE"      >> $GITHUB_OUTPUT
+          echo "violations<<EOF"          >> $GITHUB_OUTPUT
+          echo "$VIOLATIONS"              >> $GITHUB_OUTPUT
+          echo "EOF"                      >> $GITHUB_OUTPUT
+          echo "cautions=$CAUTIONS"       >> $GITHUB_OUTPUT
+
+      - name: Post filter result as PR comment
+        uses: actions/github-script@v7
+        if: steps.find_post.outputs.post_file != ''
+        with:
+          script: |
+            const passed    = "${{ steps.filter.outputs.filter_passed }}" === "True";
+            const score     = "${{ steps.filter.outputs.filter_score }}";
+            const violations = `${{ steps.filter.outputs.violations }}`;
+            const cautions  = "${{ steps.filter.outputs.cautions }}";
+            const file      = "${{ steps.find_post.outputs.post_file }}";
+
+            const icon   = passed ? "✅" : "❌";
+            const status = passed ? "통과" : "실패";
+            const body = [
+              `## ${icon} AdSense 키워드 필터 ${status}`,
+              "",
+              `| 항목 | 결과 |`,
+              `|------|------|`,
+              `| 안전도 점수 | **${score}/100** |`,
+              `| 검사 파일 | \`${file}\` |`,
+              `| 위반 키워드 | ${violations} |`,
+              `| 주의 키워드 | ${cautions} |`,
+              "",
+              passed
+                ? "AdSense 정책 위반 키워드가 없습니다. 검수 후 머지하세요."
+                : "⚠️ **위반 키워드가 감지됐습니다.** 포스트를 수정한 후 다시 push하세요.",
+            ].join("\n");
+
+            // 기존 봇 코멘트가 있으면 업데이트, 없으면 새로 생성
+            const { data: comments } = await github.rest.issues.listComments({
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(
+              c => c.user.type === "Bot" && c.body.includes("AdSense 키워드 필터")
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+            // 필터 실패 시 워크플로우도 실패 처리
+            if (!passed) {
+              core.setFailed("AdSense 키워드 필터 실패 — PR 코멘트를 확인하세요.");
+            }
