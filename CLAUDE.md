@@ -19,7 +19,8 @@ kostat-agent-plugin/
 │   ├── kostat-memory-ticket/
 │   ├── kostat-skill-check/
 │   ├── kostat-memory-loader/
-│   └── kostat-tal/
+│   ├── kostat-tal/
+│   └── kostat-report-checklist/ ← 보고서 작성 의사결정 체크리스트 [신규]
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
 ├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
@@ -62,6 +63,21 @@ AUTOMATION/
 - hooks.json에서 항상 `python "..."` 형식 사용 (Windows 호환)
 - `python3`는 Windows에서 없을 수 있으므로 사용 금지
 - shebang(`#!/usr/bin/env python3`)은 유지 가능 (Windows에서 무시됨)
+
+## Obsidian Vault 연동
+
+`OBSIDIAN_VAULT_PATH` 환경변수 설정 시 세션 종료(Stop 훅)마다 docs/ 문서를 자동 동기화합니다.
+
+```
+# settings.json 또는 .env에 추가
+OBSIDIAN_VAULT_PATH=C:\Users\USER\Documents\ObsidianVault
+OBSIDIAN_TARGET_DIR=KOSTAT          # 볼트 내 대상 폴더 (기본값: KOSTAT)
+```
+
+동기화 대상 파일:
+- `docs/11. KOSTAT 보고서 체크리스트.md` → `<vault>/KOSTAT/` 아래로 복사
+
+수동 실행: `python hooks/kostat-obsidian-sync.py`
 
 ## Orchestrator 연동 규칙 (Level 7)
 - `ORCHESTRATOR_ENGINE=direct`: handlers.py 직접 호출 (기존)
