@@ -56,6 +56,11 @@
         "description": "EOD 세션 로깅 + pending_retro flag",
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
         "timeout": 5
+      },
+      {
+        "description": "Obsidian vault 동기화 (OBSIDIAN_VAULT_PATH 설정 시에만 실행)",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-obsidian-sync.py\"",
+        "timeout": 10
       }
     ]
   }
