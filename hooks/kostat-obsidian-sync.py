@@ -3,17 +3,29 @@
 kostat-obsidian-sync.py
 Obsidian vault로 KOSTAT 문서를 동기화합니다.
 
-환경 변수 설정 (settings.json 또는 .env):
-  OBSIDIAN_VAULT_PATH  예) C:\\Users\\USER\\Documents\\ObsidianVault
-  OBSIDIAN_TARGET_DIR  예) 00. Skills  (기본값: "KOSTAT")
+설정 우선순위:
+  1. 환경변수  OBSIDIAN_VAULT_PATH, OBSIDIAN_TARGET_DIR
+  2. hooks/obsidian-config.json  (vault_path, target_dir)
 """
+import json
 import os
 import shutil
 import sys
 from pathlib import Path
 
-VAULT_PATH = os.environ.get("OBSIDIAN_VAULT_PATH", "")
-TARGET_DIR = os.environ.get("OBSIDIAN_TARGET_DIR", "KOSTAT")
+def _load_config():
+    config_file = Path(__file__).parent / "obsidian-config.json"
+    if config_file.exists():
+        try:
+            with open(config_file, encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+_cfg = _load_config()
+VAULT_PATH = os.environ.get("OBSIDIAN_VAULT_PATH", _cfg.get("vault_path", ""))
+TARGET_DIR = os.environ.get("OBSIDIAN_TARGET_DIR", _cfg.get("target_dir", "KOSTAT"))
 
 SYNC_FILES = [
     "docs/11. KOSTAT 보고서 체크리스트.md",
