@@ -19,10 +19,10 @@ POP3 폴링/사용자 입력/파일 감지 등에서 트리거를 식별하고,
 
 | 트리거 키워드 | 우선순위 | 소집 에이전트팀 | 실행 모드 |
 |--------------|---------|----------------|----------|
-| PO PDF 수신 | 1 | PO-US + Doc-Translate + Calendar | Fan-out 3way |
-| HK PO / Amkor PO 수신 | 1 | HK-PO + Doc-Translate | Fan-out 2way |
-| OOR / Open Order | 2 | OOR + Validator | Fan-out 2way |
-| Commission / Invoice | 3 | Commission-Gen + Commission-Eval | Gen/Eval Loop |
+| PO PDF 수신 | 1 | PO-US + Doc-Translate + Calendar + Validator | Fan-out 3way + Gate |
+| HK PO / Amkor PO 수신 | 1 | HK-PO + Doc-Translate + Validator | Fan-out 2way + Gate |
+| OOR / Open Order | 2 | OOR + Validator | Fan-out 2way + Gate |
+| Commission / Invoice | 3 | Commission-Gen + Commission-Eval + Validator | Gen/Eval Loop + Gate |
 | 업무끝 / EOD | 4 | EOD-Retro + Memory-Ticket | 순차 |
 | /kostat | 5 | Morning-Briefing | 단일 |
 | /skill-check | 6 | Skill-Check | 단일 |
@@ -78,18 +78,20 @@ POP3 폴링/사용자 입력/파일 감지 등에서 트리거를 식별하고,
 | PO-US | kostat-po-update (Task 1) | 항상 투입 |
 | Doc-Translate | kostat-po-update (Task 2) | 항상 투입 |
 | Calendar | kostat-po-update (Task 3) | Calendar API 사용 가능 시 |
+| Validator | kostat-validator (gate) | PO-US(Task 1) 완료 후 항상 투입 |
 
 ### Team B: OOR 대응
 | 에이전트 | 스킬 | 투입 조건 |
 |----------|------|----------|
-| OOR | kostat-oor-weekly (Task 1) | 항상 투입 |
-| Validator | kostat-oor-weekly (Task 2) | 항상 투입 |
+| OOR | kostat-oor-weekly (Task 1 + Task 2) | 항상 투입 |
+| Validator | kostat-validator (gate) | OOR(Task 1) 완료 후 항상 투입 — Task 2 PO#불일치 리포트를 Quality 근거로 흡수 |
 
 ### Team C: 커미션 대응
 | 에이전트 | 스킬 | 투입 조건 |
 |----------|------|----------|
 | Commission-Gen | kostat-commission-invoice (Phase 1) | 항상 투입 |
 | Commission-Eval | kostat-commission-invoice (Phase 2) | Generator 완료 후 |
+| Validator | kostat-validator (gate) | Evaluator 완료 후, 최종 저장 전 |
 
 ### Team D: EOD 회고
 | 에이전트 | 스킬 | 투입 조건 |
@@ -164,7 +166,8 @@ pending → running → completed
 |----------|------|
 | 단일 Task 실패 | 재시도 1회 → 실패 시 해당 Task 스킵 + 알림 |
 | 2개 이상 Task 실패 | 전체 중단 → Telegram 긴급 알림 |
-| Validator 에러 발견 | 사용자 확인 요청 (자동 진행 금지) |
+| Validator Verdict=보류 | 사용자 확인 요청 (자동 진행 금지, 저장은 진행) |
+| Validator Verdict=반려 | 원본 Task 저장 중단 → 근거 3줄 요약과 함께 즉시 에스컬레이션 |
 | API 키 없음 | 해당 Task 스킵 + 환경설정 안내 |
 | 타임아웃 | 강제 종료 → 부분 결과로 처리 |
 

@@ -8,13 +8,14 @@ KOSTAT 전용 스킬과 Hook 스크립트를 제공합니다.
 ```
 kostat-agent-plugin/
 ├── .claude-plugin/plugin.json   ← Plugin 메타데이터
-├── skills/                       ← KOSTAT 스킬 11개 (SKILL.md)
+├── skills/                       ← KOSTAT 스킬 12개 (SKILL.md)
 │   ├── kostat-orchestrator/      ← Level 7 Orchestrator
 │   ├── kostat-po-update/         ← Level 6 Fan-out 3way
 │   ├── kostat-hk-po-update/      ← Level 6 Fan-out 2way [신규 업그레이드]
 │   ├── kostat-oor-weekly/        ← Level 6 Fan-out 2way
 │   ├── kostat-commission-invoice/ ← Level 6 Gen/Eval Loop
-│   ├── kostat-eod-retrospective/ ← Level 6 Fan-out 2way [신규 업그레이드]
+│   ├── kostat-validator/         ← Level 6 Quality Gate [신규 — Quality/Verdict/Answerability]
+│   ├── kostat-eod-retrospective/ ← Level 6 Fan-out 2way [Validator 로그 Compaction 연동]
 │   ├── kostat-morning-briefing/
 │   ├── kostat-memory-ticket/
 │   ├── kostat-skill-check/
