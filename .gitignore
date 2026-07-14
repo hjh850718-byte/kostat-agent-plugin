@@ -27,3 +27,6 @@ outputs/
 
 # Node
 node_modules/
+
+# External repos cloned for reference
+hermes-agent/
