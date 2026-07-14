@@ -61,9 +61,35 @@ Task1/Task2 모두 공유하는 입력 데이터를 먼저 수집:
 | 발생한 이슈/에러 | 대화 내역 |
 | 주요 결정사항 | 대화 내역 |
 | 오늘의 AI 작업 로그 | session trace |
+| Validator Quality/Verdict 로그 | `validator-YYYY-MM-DD.jsonl` (append-only, kostat-validator) |
 | 직전 KPT 파일 | `*KPT*.md` 최신 파일 |
 
 **출력**: 구조화된 세션 히스토리 데이터 (두 Task에 동일 전달)
+
+---
+
+### Validator 로그 Compaction (옵션 C 연동)
+
+**담당**: kostat-validator가 당일 쌓은 append-only 로그(`{KOSTAT_AI_BRIDGE_DIR}\validator-log\validator-YYYY-MM-DD.jsonl`)를 압축하여 다음 세션 컨텍스트로 넘긴다. 세션마다 원본을 통째로 재로드하지 않는 것이 목적(124K 토큰 목표 기여).
+
+**압축 규칙**:
+1. Verdict별 건수 집계 (승인/보류/반려)
+2. **승인 건**은 건수만 남기고 Quality 상세 로그는 버림
+3. **보류·반려 건**은 Validator가 생성한 Answerability 3줄 요약을 **원문 그대로 보존** — 과도한 압축으로 근거가 유실되지 않도록 요약의 요약을 만들지 않는다
+4. 압축본만 `.ai-bridge/session-context.md`에 포함
+
+**압축본 형식**:
+```markdown
+## Validator 요약 (2026-07-14)
+- 승인 12건 / 보류 2건 / 반려 0건
+- 보류 상세:
+  1. PO#6000046950 (kostat-po-update) — Qty 불일치(1000→900) → 사용자 확인 대기
+  2. OOR 2026W28 (kostat-oor-weekly) — PO# AS열 공백 → 확인 필요
+```
+
+**아카이브**: 압축 완료 후 원본 `validator-YYYY-MM-DD.jsonl`을 Obsidian Vault KPT 회고 폴더로 이관: `{OBSIDIAN_VAULT}\KPT\validator-archive\validator-YYYY-MM-DD.jsonl`. 이관 완료 후 `.ai-bridge/validator-log/`의 당일 원본은 세션 컨텍스트 로드 대상에서 제외한다.
+
+> Validator 로그 스키마·Quality/Verdict/Answerability 상세: [kostat-validator/SKILL.md](../kostat-validator/SKILL.md)
 
 ---
 
@@ -149,6 +175,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - **저장 경로**: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
 - **날짜 포맷**: `2026.06.02 (화 저녁)` — 요일 정확성
 - Memory Ticket 자동 발행 (Lessons에서 CLAUDE.md 업데이트 후보 발견 시)
+- Validator 로그 Compaction 실행 (위 "Validator 로그 Compaction" 절) — 압축본은 KPT 파일 하단에 "Validator 요약" 섹션으로 첨부, 원본은 Obsidian `KPT\validator-archive\`로 아카이브
 
 ---
 
@@ -163,7 +190,8 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
    - **Try**: 구체적인 개선 액션 (추상적 표현 금지)
 3. **Lessons Learned — AI 작업 비효율 기록**
 4. **내일 First Action** — 3~5개 액션, 🔴/🟠/🟡 긴급도 표시
-5. **저장** — `KPT_YYYY-MM-DD.md` 형식, Notion 업무일지 하위에도 생성
+5. **Validator 로그 Compaction** — 당일 `validator-YYYY-MM-DD.jsonl` 압축 + 원본 Obsidian 아카이브
+6. **저장** — `KPT_YYYY-MM-DD.md` 형식, Notion 업무일지 하위에도 생성
 
 ## Lessons Learned 섹션 작성 기준
 
@@ -231,6 +259,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] Task 2 (Lessons): 반복 패턴 감지 완료 (3회 이상 발생 시)
 - [ ] Task 2 (Lessons): CLAUDE.md 업데이트 후보 식별 완료
 - [ ] Serial Step: 내일 First Action 3~5개 구체화 완료
+- [ ] Validator 로그 Compaction 완료 — 보류/반려 건 Answerability 요약 원문 보존, 원본 Obsidian 아카이브
 - [ ] Serial Step: 🔴/🟠/🟡 긴급도 표시 정확
 - [ ] 최종 저장 경로 정확: `KPT\KPT_YYYY-MM-DD.md`
 - [ ] Memory Ticket 연동 완료 (CLAUDE.md 업데이트 후보 있을 경우)
