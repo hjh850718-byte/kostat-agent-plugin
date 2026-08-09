@@ -64,6 +64,21 @@ cp -r kostat-agent-plugin/* ~/.claude/plugins/kostat-agent/
 
 ---
 
+## 모델 설정
+
+기본적으로 모든 에이전트는 Claude Code CLI의 기본 모델(Claude)로 동작합니다.
+PO/OOR처럼 반복적인 Fan-out 작업의 비용을 줄이고 싶다면 `KOSTAT_MODEL_ENV`로
+해당 창만 Qwen3.8-Max 같은 저렴한 모델로 교체할 수 있습니다(오케스트레이터/검증
+에이전트는 판단 정확도를 위해 항상 Claude로 유지).
+
+```bash
+KOSTAT_MODEL_ENV=~/.kostat-qwen.env ./scripts/kostat-team.sh
+```
+
+> 상세: [docs/11. Qwen3.8-Max 모델 연동 가이드.md](docs/11.%20Qwen3.8-Max%20모델%20연동%20가이드.md)
+
+---
+
 ## Hook 스크립트
 
 플러그인과 함께 7개의 Hook 스크립트가 제공됩니다:

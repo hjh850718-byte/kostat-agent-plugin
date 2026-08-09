@@ -13,15 +13,31 @@
 # 세션명
 SESSION="kostat"
 
+# KOSTAT_MODEL_ENV: PO/OOR 창의 기반 모델을 저렴한 모델(예: Qwen3.8-Max)로
+# 교체하고 싶을 때 env 파일 경로를 지정 (미지정 시 Claude 기본 모델 유지).
+# 상세: docs/11. Qwen3.8-Max 모델 연동 가이드.md
+MODEL_SOURCE_CMD=""
+if [ -n "${KOSTAT_MODEL_ENV:-}" ]; then
+  if [ -f "${KOSTAT_MODEL_ENV}" ]; then
+    MODEL_SOURCE_CMD="source \"${KOSTAT_MODEL_ENV}\" && "
+  else
+    echo "⚠️  KOSTAT_MODEL_ENV 파일을 찾을 수 없음: ${KOSTAT_MODEL_ENV} (Claude 기본 모델로 진행)"
+  fi
+fi
+
 echo "🚀 KOSTAT Agent Team starting..."
 echo "   Session: ${SESSION}"
 echo "   Windows: orchestrator | po-agent | oor-agent | validator"
+if [ -n "${MODEL_SOURCE_CMD}" ]; then
+  echo "   Model override (po-agent/oor-agent): ${KOSTAT_MODEL_ENV}"
+fi
 echo ""
 
 # 기존 세션 종료
 tmux kill-session -t ${SESSION} 2>/dev/null
 
 # ── Orchestrator Window ──────────────────────────────────────
+# 트리거 분류·팀 소집 판단은 정확도가 중요하므로 항상 Claude 기본 모델로 실행.
 tmux new-session -d -s ${SESSION} -n orchestrator
 tmux send-keys -t ${SESSION}:orchestrator 'echo "=== KOSTAT Orchestrator (Level 7) ==="' Enter
 tmux send-keys -t ${SESSION}:orchestrator 'echo "트리거 감지 → 에이전트팀 소집 → 결과 취합"' Enter
@@ -32,17 +48,18 @@ sleep 1
 tmux new-window -t ${SESSION} -n po-agent
 tmux send-keys -t ${SESSION}:po-agent 'echo "=== PO Agent (kostat-po-update) ==="' Enter
 tmux send-keys -t ${SESSION}:po-agent 'echo "PO PDF → Excel 입력 + 요약 + Calendar"' Enter
-tmux send-keys -t ${SESSION}:po-agent 'claude --dangerously-skip-permissions' Enter
+tmux send-keys -t ${SESSION}:po-agent "${MODEL_SOURCE_CMD}claude --dangerously-skip-permissions" Enter
 sleep 1
 
 # ── OOR Agent Window ─────────────────────────────────────────
 tmux new-window -t ${SESSION} -n oor-agent
 tmux send-keys -t ${SESSION}:oor-agent 'echo "=== OOR Agent (kostat-oor-weekly) ==="' Enter
 tmux send-keys -t ${SESSION}:oor-agent 'echo "Bring Forward 분석 + PO# 검증 리포트"' Enter
-tmux send-keys -t ${SESSION}:oor-agent 'claude --dangerously-skip-permissions' Enter
+tmux send-keys -t ${SESSION}:oor-agent "${MODEL_SOURCE_CMD}claude --dangerously-skip-permissions" Enter
 sleep 1
 
 # ── Validator Window ─────────────────────────────────────────
+# 데이터 무결성 검증은 정확도가 중요하므로 항상 Claude 기본 모델로 실행.
 tmux new-window -t ${SESSION} -n validator
 tmux send-keys -t ${SESSION}:validator 'echo "=== Validator Agent ==="' Enter
 tmux send-keys -t ${SESSION}:validator 'echo "PO# 불일치 검증 | 데이터 무결성 체크 | 교차 검증"' Enter
