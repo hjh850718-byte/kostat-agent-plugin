@@ -81,3 +81,6 @@ katok 저장소의 `AGENTS.md`, `skills/katok/SKILL.md`를 그대로 준수한�
   `x86_64-apple-darwin`용으로 제공하지 않기 때문)
 - 기존 `kostat-morning-briefing`의 "KakaoTalk (MCP)"는 **발송(PlayMCP)** 용도이고,
   이 스킬(katok)은 **로컬 검색·조회 전용**입니다. 서로 다른 연동이므로 혼동하지 않는다.
+- Mac 환경이 아직 없다면 `kostat-kakao-export-search`(Windows 카카오톡 PC 클라이언트의
+  "대화 내보내기" txt 파일 로컬 검색, 별도 CLI 설치 불필요)를 대신 사용할 수 있다.
+  자동 동기화·semantic 검색은 없지만 지금 바로 Windows에서 쓸 수 있다.

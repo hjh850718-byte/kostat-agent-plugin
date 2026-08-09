@@ -23,6 +23,7 @@
 | 도구 | 용도 | 필수 여부 | 비고 |
 |------|------|-----------|------|
 | [katok](https://github.com/NomaDamas/katok) | 카카오톡 대화 로컬 검색·조회 (`kostat-katok-search` 스킬) | 선택 | **Apple Silicon macOS 전용.** 이 플러그인의 기본 작업 환경(Windows)에서는 실행 불가 — 현재 설계/문서화 단계이며 실행은 별도 Mac 환경에서만 유효. MCP 서버가 아니라 로컬에 설치하는 Rust CLI. `katok send`(발송)는 통합 범위에서 제외. |
+| 카카오톡 PC 클라이언트 대화 내보내기 (txt) | 카카오톡 대화 로컬 검색 (`kostat-kakao-export-search` 스킬) | 선택 | **Windows에서 바로 사용 가능.** 별도 CLI 설치 없이 Claude Code 기본 도구(Read/Grep)로 동작. 자동 동기화가 없어 사용자가 수동으로 재내보내기해야 최신화됨. Mac이 없을 때 katok의 대체 수단. |
 
 ## 로컬 파일 시스템
 

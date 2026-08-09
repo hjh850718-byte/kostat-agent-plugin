@@ -8,7 +8,7 @@ KOSTAT 전용 스킬과 Hook 스크립트를 제공합니다.
 ```
 kostat-agent-plugin/
 ├── .claude-plugin/plugin.json   ← Plugin 메타데이터
-├── skills/                       ← KOSTAT 스킬 12개 (SKILL.md)
+├── skills/                       ← KOSTAT 스킬 13개 (SKILL.md)
 │   ├── kostat-orchestrator/      ← Level 7 Orchestrator
 │   ├── kostat-po-update/         ← Level 6 Fan-out 3way
 │   ├── kostat-hk-po-update/      ← Level 6 Fan-out 2way [신규 업그레이드]
@@ -20,7 +20,8 @@ kostat-agent-plugin/
 │   ├── kostat-skill-check/
 │   ├── kostat-memory-loader/
 │   ├── kostat-tal/
-│   └── kostat-katok-search/      ← katok CLI 연동 (카카오톡 로컬 검색, macOS 전용, 설계 단계)
+│   ├── kostat-katok-search/      ← katok CLI 연동 (카카오톡 로컬 검색, macOS 전용, 설계 단계)
+│   └── kostat-kakao-export-search/ ← 카카오톡 대화 내보내기 txt 로컬 검색 (Windows 가능)
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
 ├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
@@ -80,3 +81,6 @@ AUTOMATION/
 - 기존 `kostat-morning-briefing`의 "KakaoTalk (MCP)"는 PlayMCP를 통한 **발송**용이고, katok은
   **로컬 검색·조회 전용**이다. 서로 다른 연동이므로 문서·코드에서 혼동하지 않는다.
 - `katok send`(메시지 전송)는 이 플러그인 통합 범위에서 명시적으로 제외한다.
+- Mac 환경이 없는 동안에는 `kostat-kakao-export-search`(Windows 카카오톡 PC 클라이언트의
+  "대화 내보내기" txt 로컬 검색, 별도 CLI 불필요)를 대체 수단으로 쓴다. 자동 동기화·semantic
+  검색은 없고 사용자가 수동으로 재내보내기를 해야 최신화된다.
