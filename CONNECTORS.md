@@ -9,7 +9,7 @@
 | Gmail | 이메일 분류, PO/OOR 메일 감지 | 권장 |
 | Google Calendar | PO 납기일 등록 | 선택 |
 | Notion | KPT 저장, Memory Ticket 보관 | 선택 |
-| KakaoTalk | 알림 수신 | 선택 |
+| KakaoTalk | 알림 수신 / 메시지 발송 | 선택 |
 
 ## 외부 API
 
@@ -17,6 +17,12 @@
 |--------|------|-----------|
 | Telegram Bot | 작업 완료 알림, 에러 알림 | Bot Token (`.env`) |
 | 관세청 수출입무역통계 | HS코드·환율 조회 (직접 조회) | 공개 API |
+
+## 로컬 CLI 연동 (MCP 아님)
+
+| 도구 | 용도 | 필수 여부 | 비고 |
+|------|------|-----------|------|
+| [katok](https://github.com/NomaDamas/katok) | 카카오톡 대화 로컬 검색·조회 (`kostat-katok-search` 스킬) | 선택 | **Apple Silicon macOS 전용.** 이 플러그인의 기본 작업 환경(Windows)에서는 실행 불가 — 현재 설계/문서화 단계이며 실행은 별도 Mac 환경에서만 유효. MCP 서버가 아니라 로컬에 설치하는 Rust CLI. `katok send`(발송)는 통합 범위에서 제외. |
 
 ## 로컬 파일 시스템
 

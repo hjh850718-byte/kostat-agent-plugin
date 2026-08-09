@@ -1,7 +1,7 @@
 # KOSTAT Agent Plugin
 
 KOSTAT 해외영업 업무 자동화를 위한 Claude Code Plugin입니다.
-PO PDF → Excel 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑 등 11개 스킬을 제공합니다.
+PO PDF → Excel 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑 등 12개 스킬을 제공합니다.
 
 ---
 
@@ -47,6 +47,7 @@ cp -r kostat-agent-plugin/* ~/.claude/plugins/kostat-agent/
 | kostat-memory-ticket | Memory Ticket 발행 (학습/판단 기준 기록) | '/memory-ticket' | L1 |
 | kostat-skill-check | 스킬 상태 점검 (Lifecycle 관리) | '/skill-check' | L1 |
 | kostat-tal | KOSTAT 판단 기준 로드 | '판단 기준', 'tal', '가이드라인' | L1 |
+| kostat-katok-search | 고객사 카카오톡 대화 로컬 검색 (katok CLI, macOS 전용, 설계 단계) | '카톡 검색', 'katok 검색' | L1 |
 
 ---
 
@@ -58,7 +59,8 @@ cp -r kostat-agent-plugin/* ~/.claude/plugins/kostat-agent/
 | Google Calendar (MCP) | PO 납기일 등록 | 선택 |
 | Telegram Bot | 작업 완료 알림 | 권장 |
 | Notion (MCP) | KPT 저장, Memory Ticket 보관 | 선택 |
-| KakaoTalk (MCP) | 알림 수신 | 선택 |
+| KakaoTalk (MCP) | 알림 수신 / 메시지 발송 (PlayMCP) | 선택 |
+| katok (로컬 CLI) | 카카오톡 대화 로컬 검색 (Apple Silicon macOS 전용, 설계 단계) | 선택 |
 
 > 상세: [CONNECTORS.md](CONNECTORS.md)
 
@@ -87,7 +89,7 @@ kostat-agent-plugin/
 ├── .claude-plugin/
 │   ├── marketplace.json    ← 마켓플레이스 카탈로그
 │   └── plugin.json         ← 플러그인 메타데이터
-├── skills/                 ← KOSTAT 스킬 11개 (SKILL.md)
+├── skills/                 ← KOSTAT 스킬 12개 (SKILL.md)
 │   ├── kostat-orchestrator/
 │   ├── kostat-po-update/
 │   ├── kostat-hk-po-update/
@@ -98,7 +100,8 @@ kostat-agent-plugin/
 │   ├── kostat-memory-loader/
 │   ├── kostat-memory-ticket/
 │   ├── kostat-skill-check/
-│   └── kostat-tal/
+│   ├── kostat-tal/
+│   └── kostat-katok-search/
 ├── references/             ← 상세 매핑/규칙 (토큰 절감용 분리)
 │   ├── rate-tables.md
 │   ├── column-map.md
