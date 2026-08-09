@@ -145,9 +145,26 @@ pending → running → completed
                  → timeout
 ```
 
+### Task 상태 이벤트 스키마 (v2 — 설계안)
+
+`task-status.json`은 기존 필드(`skill`/`file`/`status`/`timestamp`)에 더해
+아래 필드를 선택적으로 기록할 수 있다. 상세 스키마, 필드 정의, 하위 호환 규칙은
+[`docs/11. PraisonAI 참고 Orchestrator 신뢰성 설계.md`](../../docs/11.%20PraisonAI%20참고%20Orchestrator%20신뢰성%20설계.md) 참고.
+
+| 필드 | 값 | 설명 |
+|------|-----|------|
+| `task_id` | `{접두사}-TASK{N}-{YYYYMMDD}-{순번}` | 아래 Task ID 체계와 동일 |
+| `event_type` | `START`\|`RUNNING`\|`RETRY`\|`ERROR`\|`COMPLETE` | 상태 전이 이벤트명 |
+| `error_category` | `config`\|`dependency`\|`tool`\|`model`\|`infra`\|`null` | 아래 에러 처리 §5분류 참고 |
+| `retry_count` / `max_retries` | 정수 | `max_retries`는 항상 1 |
+| `next_retry_at` | ISO8601 \| `null` | 아래 Backoff 정책으로 계산된 재시도 시각 |
+
+> Hook(`kostat-handoff-writer.py` 등) 코드가 이 v2 스키마를 실제로 기록하도록 갱신하는 작업은
+> 별도 범위다 — 이 SKILL.md는 Orchestrator(Claude)가 판단·기록할 때 따르는 설계 기준만 정의한다.
+
 ### 제한
 - Task 타임아웃: 10분
-- 재시도: 1회 (동일 Task 재실행)
+- 재시도: 최대 1회, 에러 카테고리별 Backoff 적용 (아래 표 참고)
 - 전체 팀 타임아웃: 15분
 - 동시 실행 Task 수: 최대 4개 (리소스 제한)
 
@@ -160,13 +177,35 @@ pending → running → completed
 
 ## 에러 처리
 
-| 에러 유형 | 처리 |
-|----------|------|
-| 단일 Task 실패 | 재시도 1회 → 실패 시 해당 Task 스킵 + 알림 |
+### 5분류 체계 (PraisonAI 참고)
+
+단일/다중 Task 실패 여부만 보던 기존 처리를 실패 **원인 카테고리**로 재구성한다.
+카테고리는 `task-status.json`의 `error_category` 필드 값과 1:1 대응한다.
+
+| 카테고리 | KOSTAT 시나리오 예시 | 재시도 | Backoff | 기본 대응 |
+|----------|----------------------|--------|---------|----------|
+| `config` | `.env` 값 누락, 파일 경로 오탈자 | 안 함 | — | 즉시 중단 + 설정 안내 |
+| `dependency` | API 키 없음 (Calendar/Telegram/Notion) | 안 함 | — | 해당 Task 스킵 + 경고, 나머지 진행 |
+| `tool` | Excel 파싱 실패, PDF 추출 실패, Validator 불일치 | 1회 | 30초 | Backoff 후 재시도 → 실패 시 스킵 + 알림 |
+| `model` | Claude API 타임아웃/rate limit | 1회 | 30초 | Backoff 후 재시도 → 반복 실패 시 수동 처리 전환 |
+| `infra` | POP3 연결 끊김, 동시 실행 4개 초과 정체, 디스크 부족 | 1회 | 120초 (서킷브레이커) | 신규 Task 일시 보류 + 마지막 체크포인트에서 재개 |
+
+`next_retry_at = 실패시각 + Backoff초` 로 계산하며, Orchestrator는 이 시각이 지난 Task만
+재시도 대상으로 취합한다.
+
+### 팀 단위 규칙 (기존 유지)
+
+| 상황 | 처리 |
+|------|------|
 | 2개 이상 Task 실패 | 전체 중단 → Telegram 긴급 알림 |
-| Validator 에러 발견 | 사용자 확인 요청 (자동 진행 금지) |
-| API 키 없음 | 해당 Task 스킵 + 환경설정 안내 |
-| 타임아웃 | 강제 종료 → 부분 결과로 처리 |
+| Validator 에러 발견 | 카테고리와 무관하게 사용자 확인 요청 (자동 진행 금지) |
+| 타임아웃 | 강제 종료 → 부분 결과로 처리 (`infra` 카테고리로 기록) |
+
+### Replay(재실행)
+
+`failed_final` Task를 재실행할 때는 `task_id`에 `-REPLAY{n}` 접미사를 붙여 새 Task로 등록한다
+(예: `PO-TASK1-20260809-01-REPLAY1`). Fan-out 팀에서 이미 `completed`인 형제 Task는 재실행하지
+않고 실패한 Task만 다시 소집한다. 상세는 `docs/11` §5 참고.
 
 ---
 

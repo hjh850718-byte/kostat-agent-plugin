@@ -67,4 +67,6 @@ AUTOMATION/
 - `ORCHESTRATOR_ENGINE=direct`: handlers.py 직접 호출 (기존)
 - `ORCHESTRATOR_ENGINE=claude`: Claude Code subprocess 실행 (fanout 모드)
 - `.env`에서 ENGINE 전환 가능
-- Task 타임아웃: 10분, 재시도: 1회, 동시 실행: 최대 4개
+- Task 타임아웃: 10분, 재시도: 1회(카테고리별 Backoff 적용), 동시 실행: 최대 4개
+- 에러 카테고리(config/dependency/tool/model/infra)·Backoff·Replay 설계는
+  `docs/11. PraisonAI 참고 Orchestrator 신뢰성 설계.md`와 `skills/kostat-orchestrator/SKILL.md` 참고
