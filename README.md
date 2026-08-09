@@ -105,7 +105,7 @@ kostat-agent-plugin/
 │   ├── field-mapping.md
 │   └── xview-mapping.md
 ├── hooks/                  ← Hook Python 스크립트
-│   ├── hooks.json
+│   ├── hooks.reference.json  ← 공식 스키마 참조용 (자동 로드 아님, 수동 settings.json 등록)
 │   └── *.py
 ├── scripts/                ← 실행 스크립트
 │   └── kostat-team.sh
@@ -121,7 +121,7 @@ kostat-agent-plugin/
 
 ## 버전
 
-현재 버전: 1.0.0
+현재 버전: 1.4.0
 
 ## 라이선스
 

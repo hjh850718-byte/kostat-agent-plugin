@@ -22,7 +22,7 @@ kostat-agent-plugin/
 │   └── kostat-tal/
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
-├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
+├── hooks/                        ← Hook Python 스크립트 11개 + hooks.reference.json (참조용, 자동 로드 아님)
 ├── docs/                         ← 참고 자료 (설계 문서 등)
 ├── CLAUDE.md                     ← 이 파일
 ├── package.json                  ← 버전/의존성
@@ -49,6 +49,7 @@ AUTOMATION/
   - 재설치 전까지 Claude는 AppData 캐시(구버전)를 사용함
   - 설정 경로: Claude 앱 → Settings → Capabilities → 플러그인 재설치
 - hooks/의 Python 스크립트는 `Documents/Claude/claude-tray/`와 동기화 유지
+- `hooks/hooks.reference.json`은 공식 Claude Code hooks 스키마를 따르는 참조 문서. 파일명이 자동 로드 규약(`hooks/hooks.json`)과 다르므로 Plugin 활성화만으로는 실행되지 않으며, 개인 `settings.json`에 수동 등록하는 방식을 그대로 유지함 (claude-tray 사본과의 중복 실행 방지 목적)
 - package.json의 version은 semantic versioning 준수
 - 주요 변경 시 `docs/08. KOSTAT Plugin 패키징 설계.md`도 함께 업데이트
 
@@ -59,7 +60,7 @@ AUTOMATION/
 | AppData\Roaming\Claude\...\skills\ | 설치 캐시 | ❌ 플러그인 재설치로만 갱신 |
 
 ## Python 호출 규칙
-- hooks.json에서 항상 `python "..."` 형식 사용 (Windows 호환)
+- hooks.reference.json에서 항상 `python "..."` 형식 사용 (Windows 호환)
 - `python3`는 Windows에서 없을 수 있으므로 사용 금지
 - shebang(`#!/usr/bin/env python3`)은 유지 가능 (Windows에서 무시됨)
 

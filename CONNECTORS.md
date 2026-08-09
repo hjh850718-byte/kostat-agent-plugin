@@ -18,6 +18,10 @@
 | Telegram Bot | 작업 완료 알림, 에러 알림 | Bot Token (`.env`) |
 | 관세청 수출입무역통계 | HS코드·환율 조회 (직접 조회) | 공개 API |
 
+> **Telegram 방식 참고**: `anthropics/claude-plugins-official`의 공식 `telegram` 플러그인(MCP 기반, 양방향 채팅 브리지)은 검토 결과 채택하지 않음.
+> 해당 플러그인은 Bun 런타임과 `claude --channels` 대화형 세션이 전제된 구조로, AUTOMATION의 "POP3 폴러 → 단방향 완료/에러 알림" 용도와 맞지 않음.
+> 현재의 경량 Bot Token(`.env`) 직접 호출 방식을 유지한다.
+
 ## 로컬 파일 시스템
 
 | 경로 | 용도 |
