@@ -1,7 +1,7 @@
 # KOSTAT Agent Plugin
 
 KOSTAT 해외영업 업무 자동화를 위한 Claude Code Plugin입니다.
-PO PDF → Excel 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑 등 11개 스킬을 제공합니다.
+PO PDF → Excel 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑, 로컬 LLM 연동 등 12개 스킬을 제공합니다.
 
 ---
 
@@ -47,6 +47,7 @@ cp -r kostat-agent-plugin/* ~/.claude/plugins/kostat-agent/
 | kostat-memory-ticket | Memory Ticket 발행 (학습/판단 기준 기록) | '/memory-ticket' | L1 |
 | kostat-skill-check | 스킬 상태 점검 (Lifecycle 관리) | '/skill-check' | L1 |
 | kostat-tal | KOSTAT 판단 기준 로드 | '판단 기준', 'tal', '가이드라인' | L1 |
+| kostat-local-llm | Unsloth Desktop 로컬 LLM 서브에이전트 연동 | '로컬 LLM 연동', 'Unsloth 연결', '오프라인 모드' | L1 |
 
 ---
 
@@ -87,7 +88,7 @@ kostat-agent-plugin/
 ├── .claude-plugin/
 │   ├── marketplace.json    ← 마켓플레이스 카탈로그
 │   └── plugin.json         ← 플러그인 메타데이터
-├── skills/                 ← KOSTAT 스킬 11개 (SKILL.md)
+├── skills/                 ← KOSTAT 스킬 12개 (SKILL.md)
 │   ├── kostat-orchestrator/
 │   ├── kostat-po-update/
 │   ├── kostat-hk-po-update/
@@ -98,7 +99,8 @@ kostat-agent-plugin/
 │   ├── kostat-memory-loader/
 │   ├── kostat-memory-ticket/
 │   ├── kostat-skill-check/
-│   └── kostat-tal/
+│   ├── kostat-tal/
+│   └── kostat-local-llm/
 ├── references/             ← 상세 매핑/규칙 (토큰 절감용 분리)
 │   ├── rate-tables.md
 │   ├── column-map.md
@@ -121,7 +123,7 @@ kostat-agent-plugin/
 
 ## 버전
 
-현재 버전: 1.0.0
+현재 버전: 1.5.0
 
 ## 라이선스
 
