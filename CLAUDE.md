@@ -8,7 +8,7 @@ KOSTAT 전용 스킬과 Hook 스크립트를 제공합니다.
 ```
 kostat-agent-plugin/
 ├── .claude-plugin/plugin.json   ← Plugin 메타데이터
-├── skills/                       ← KOSTAT 스킬 11개 (SKILL.md)
+├── skills/                       ← KOSTAT 스킬 12개 (SKILL.md)
 │   ├── kostat-orchestrator/      ← Level 7 Orchestrator
 │   ├── kostat-po-update/         ← Level 6 Fan-out 3way
 │   ├── kostat-hk-po-update/      ← Level 6 Fan-out 2way [신규 업그레이드]
@@ -20,6 +20,7 @@ kostat-agent-plugin/
 │   ├── kostat-skill-check/
 │   ├── kostat-memory-loader/
 │   ├── kostat-tal/
+│   ├── kostat-local-llm/         ← Unsloth Desktop 로컬 LLM 서브에이전트 연동 [신규]
 │   └── external/                 ← 외부 설치 스킬 4개
 │       ├── skill-creator/        ← 스킬 생성/개선/eval 메타 스킬
 │       ├── superpowers/          ← 4단계 RCA 체계적 디버깅
