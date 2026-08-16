@@ -1,0 +1,280 @@
+name: Daily Blog Post
+
+# 매일 오전 7시 KST (= UTC 22:00 전날)에 자동 실행
+# 수동 실행도 가능 (workflow_dispatch)
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "포스트 주제 (비워두면 랜덤 선택)"
+        required: false
+        default: ""
+      lang:
+        description: "언어 설정"
+        required: false
+        default: "both"
+        type: choice
+        options:
+          - both
+          - ko
+          - en
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-and-pr:
+    name: 포스트 생성 → Draft PR 생성
+    runs-on: ubuntu-latest
+    # push(PR 머지) 이벤트에는 실행 안 함 — deploy job만 실행
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      # ── 1. 저장소 체크아웃 ──────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Python 환경 설정 ─────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── 3. Claude API로 초안 생성 ───────────────────────────────
+      - name: Generate draft post
+        id: generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TOPIC="${{ github.event.inputs.topic }}"
+          LANG="${{ github.event.inputs.lang }}"
+          LANG="${LANG:-both}"
+
+          # stderr(진행 로그)는 터미널에, stdout(KEY=VALUE)만 캡처
+          # POST_TOPIC은 한글/특수문자 포함 가능 → GITHUB_OUTPUT 멀티라인 형식 사용
+          if [ -z "$TOPIC" ]; then
+            SCRIPT_OUT=$(python scripts/generate_post.py --lang "$LANG" --output-dir content/posts)
+          else
+            SCRIPT_OUT=$(python scripts/generate_post.py --topic "$TOPIC" --lang "$LANG" --output-dir content/posts)
+          fi
+
+          POST_PATH=$(echo "$SCRIPT_OUT" | grep "^POST_PATH=" | cut -d= -f2-)
+          POST_SLUG=$(echo "$SCRIPT_OUT" | grep "^POST_SLUG=" | cut -d= -f2-)
+          POST_TOPIC=$(echo "$SCRIPT_OUT" | grep "^POST_TOPIC=" | cut -d= -f2-)
+
+          echo "POST_PATH=$POST_PATH"   >> "$GITHUB_OUTPUT"
+          echo "POST_SLUG=$POST_SLUG"   >> "$GITHUB_OUTPUT"
+          # 멀티라인 안전 형식으로 TOPIC 저장 (특수문자·한글 포함 가능)
+          {
+            echo "POST_TOPIC<<TOPIC_EOF"
+            echo "$POST_TOPIC"
+            echo "TOPIC_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ── 4. AdSense 키워드 필터 검사 ─────────────────────────────
+      - name: Run keyword safety filter
+        id: filter
+        run: |
+          POST_PATH="${{ steps.generate.outputs.POST_PATH }}"
+
+          if [ -z "$POST_PATH" ]; then
+            echo "오류: POST_PATH가 비어있습니다." >&2
+            exit 1
+          fi
+
+          # --json 모드: stdout=JSON만, stderr=사람이 읽는 요약
+          FILTER_OUTPUT=$(python scripts/keyword_filter.py "$POST_PATH" --json)
+          PASSED=$(echo "$FILTER_OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['passed'])" 2>/dev/null || echo "False")
+          SCORE=$(echo "$FILTER_OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['score'])" 2>/dev/null || echo "0")
+
+          echo "filter_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "filter_score=$SCORE" >> $GITHUB_OUTPUT
+          echo "필터 결과: passed=$PASSED score=$SCORE"
+
+          # 필터 실패 시 워크플로우 중단
+          if [ "$PASSED" != "True" ]; then
+            echo "::error::AdSense 키워드 필터 실패 — 포스트 초안을 검토하세요."
+            exit 1
+          fi
+
+      # ── 5. 새 브랜치 생성 및 파일 커밋 ─────────────────────────
+      - name: Commit draft post to new branch
+        id: commit
+        run: |
+          SLUG="${{ steps.generate.outputs.POST_SLUG }}"
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="draft/post-${DATE}-${SLUG}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add content/posts/ data/used_topics.json
+          git commit -m "draft: auto-generated post ${DATE} — ${SLUG}"
+          git push origin "$BRANCH"
+
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "date=$DATE"     >> $GITHUB_OUTPUT
+
+      # ── 6. Draft PR 자동 생성 ───────────────────────────────────
+      - name: Create draft pull request
+        id: create_pr
+        uses: actions/github-script@v7
+        env:
+          # 한글·특수문자가 포함된 값은 env로 전달해야 JS 문자열이 안전함
+          POST_TOPIC: ${{ steps.generate.outputs.POST_TOPIC }}
+          POST_SLUG:  ${{ steps.generate.outputs.POST_SLUG }}
+          POST_BRANCH: ${{ steps.commit.outputs.branch }}
+          FILTER_SCORE: ${{ steps.filter.outputs.filter_score }}
+        with:
+          script: |
+            const branch  = process.env.POST_BRANCH;
+            const slug    = process.env.POST_SLUG;
+            const topic   = process.env.POST_TOPIC;
+            const score   = process.env.FILTER_SCORE;
+            const date    = new Date().toLocaleDateString("ko-KR", {timeZone: "Asia/Seoul"});
+
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `[초안검토] ${topic}`,
+              head:  branch,
+              base:  "main",
+              draft: true,
+              body: [
+                "## 📝 자동 생성 블로그 포스트 초안",
+                "",
+                `- **주제**: ${topic}`,
+                `- **생성일**: ${date}`,
+                `- **AdSense 안전도**: ${score}/100`,
+                `- **파일**: \`content/posts/${date}-${slug}.md\``,
+                "",
+                "## 검수 체크리스트",
+                "- [ ] 사실 관계 확인",
+                "- [ ] 문체·톤 검토",
+                "- [ ] 이미지/캡션 추가 (선택)",
+                "- [ ] SEO 제목/설명 최종 확인",
+                "- [ ] AdSense 정책 이상 없음",
+                "",
+                "> 이 PR을 **main으로 머지**하면 Hugo 빌드 + GitHub Pages 배포가 자동 실행됩니다.",
+              ].join("\n"),
+            });
+
+            // "draft-review" 라벨 부착
+            try {
+              await github.rest.issues.addLabels({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                issue_number: pr.number,
+                labels:      ["draft-review"],
+              });
+            } catch (e) {
+              // 라벨이 없으면 먼저 생성
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                name:  "draft-review",
+                color: "fbca04",
+                description: "자동 생성 초안 — 검수 필요",
+              });
+              await github.rest.issues.addLabels({
+                owner:       context.repo.owner,
+                repo:        context.repo.repo,
+                issue_number: pr.number,
+                labels:      ["draft-review"],
+              });
+            }
+
+            console.log(`PR created: ${pr.html_url}`);
+            core.setOutput("pr_url", pr.html_url);
+            core.setOutput("pr_number", pr.number);
+
+      # ── 7. 성공 시 카카오톡 알림 ────────────────────────────────
+      - name: Notify success via KakaoTalk
+        if: success()
+        env:
+          KAKAO_ACCESS_TOKEN:  ${{ secrets.KAKAO_ACCESS_TOKEN }}
+          KAKAO_CLIENT_ID:     ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: |
+          python scripts/notify_kakao.py \
+            --status success \
+            --pr-url "${{ steps.create_pr.outputs.pr_url }}" \
+            --title  "${{ steps.generate.outputs.POST_TOPIC }}" \
+            --score  "${{ steps.filter.outputs.filter_score }}"
+
+      # ── 8. 실패 시 이메일 + 카카오톡 알림 ──────────────────────
+      - name: Notify failure via email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.NOTIFY_EMAIL }}
+          password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+          subject: "[Korea-Asia Blog] 자동 포스팅 실패 — ${{ github.run_id }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: "Blog Bot <${{ secrets.NOTIFY_EMAIL }}>"
+          body: |
+            GitHub Actions 자동 포스팅이 실패했습니다.
+
+            워크플로우: ${{ github.workflow }}
+            실행 ID: ${{ github.run_id }}
+            실행 URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            원인을 확인하고 수동으로 재실행하세요.
+
+      - name: Notify failure via KakaoTalk
+        if: failure()
+        env:
+          KAKAO_ACCESS_TOKEN:  ${{ secrets.KAKAO_ACCESS_TOKEN }}
+          KAKAO_CLIENT_ID:     ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          python scripts/notify_kakao.py \
+            --status failure \
+            --run-url "$RUN_URL" \
+            --reason  "워크플로우 실패 — 로그를 확인하세요"
+
+  # ── Hugo 빌드 + GitHub Pages 배포 (PR 머지 시 트리거) ──────────
+  deploy:
+    name: Hugo 빌드 → GitHub Pages 배포
+    runs-on: ubuntu-latest
+    # main 브랜치 push(= PR 머지)일 때만 실행
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Hugo 테마를 서브모듈로 사용할 경우
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "latest"
+          extended: true  # SCSS 지원 Extended 버전
+
+      - name: Build Hugo site
+        run: hugo --minify --baseURL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          commit_message: "deploy: ${{ github.event.head_commit.message }}"

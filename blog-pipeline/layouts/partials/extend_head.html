@@ -1,0 +1,5 @@
+{{- /* Google AdSense 자동 광고 — 승인 후 ca-pub-XXXXXXXXXXXXXXXX를 실제 ID로 교체 */ -}}
+{{- with .Site.Params.googleAdSenseId }}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ . }}"
+     crossorigin="anonymous"></script>
+{{- end }}
