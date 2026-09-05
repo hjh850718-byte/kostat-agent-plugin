@@ -45,6 +45,8 @@ Excel       한국어
 
 **작업 순서**:
 1. **HK PO PDF 읽기** — PO#, 품목, 수량, 단가, 납기 추출
+   - 기본은 Read 도구로 직접 읽기. 표가 다단/병합 셀로 깨져 필드가 누락되면 `opendataloader-pdf`로 재추출(hybrid/OCR 모드)
+   - 상세 설치·CLI·JSON 매핑: [references/pdf-extraction-tool.md](references/pdf-extraction-tool.md)
 2. **Excel 시트 매핑** — HK 전용 시트에 맞게 컬럼 매핑
 3. **기존 데이터 확인** — 동일 PO# 존재 여부 체크 (중복 시 사용자 확인)
 4. **신규 행 추가** — 적절한 위치에 삽입, 녹색 하이라이트
@@ -83,7 +85,7 @@ Excel       한국어
 
 ## Standalone 모드 (기존 순차)
 
-1. **HK PO PDF 읽기** — PO#, 품목, 수량, 단가, 납기 추출
+1. **HK PO PDF 읽기** — PO#, 품목, 수량, 단가, 납기 추출 (표 깨짐 시 opendataloader-pdf 재추출 — [references/pdf-extraction-tool.md](references/pdf-extraction-tool.md))
 2. **Excel 시트 매핑** — HK 전용 시트 컬럼 매핑
 3. **기존 데이터 확인** — 동일 PO# 존재 여부 체크
 4. **신규 행 추가**
