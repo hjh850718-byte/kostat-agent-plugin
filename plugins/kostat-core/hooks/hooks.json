@@ -1,6 +1,13 @@
 {
-  "note": "이 파일은 Plugin Hook 설정 참조입니다. 실제 Hook 등록은 settings.json에서 이루어집니다.",
+  "note": "이 파일은 Plugin Hook 설정 참조입니다. 실제 Hook 등록은 settings.json에서 이루어집니다. kostat-core는 모든 KOSTAT 플러그인이 공통으로 의존하는 안전망/트레이스 hook을 제공합니다.",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "description": "프롬프트 분석 → 작업공간(workspace)·Skill 라우팅 안내",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-workspace-router.py\"",
+        "timeout": 5
+      }
+    ],
     "PreToolUse": {
       "Write|Edit": [
         {
@@ -39,11 +46,6 @@
         "description": ".ai-bridge/ 디렉토리 초기화 (current-plan, task-status, session-context)",
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-ai-bridge.py\"",
         "timeout": 5
-      },
-      {
-        "description": "EOD 재접속 감지 (6시 이후 회고 제안)",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-sessionstart.py\"",
-        "timeout": 5
       }
     ],
     "Stop": [
@@ -51,10 +53,12 @@
         "description": ".ai-bridge/ 세션 종료 시각 기록",
         "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-ai-bridge.py\"",
         "timeout": 5
-      },
+      }
+    ],
+    "PreCompact": [
       {
-        "description": "EOD 세션 로깅 + pending_retro flag",
-        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
+        "description": "컨텍스트 압축 전 상태를 compaction-log.txt에 기록",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-compact.py\"",
         "timeout": 5
       }
     ]

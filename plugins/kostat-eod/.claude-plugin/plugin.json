@@ -1,0 +1,19 @@
+{
+  "name": "kostat-eod",
+  "description": "KOSTAT 하루 시작(모닝 브리핑)·종료(EOD KPT 회고) 루틴. kostat-core 플러그인과 함께 설치해야 합니다.",
+  "version": "1.0.0",
+  "author": {
+    "name": "한준희",
+    "email": ""
+  },
+  "homepage": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "repository": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "kostat",
+    "eod",
+    "retrospective",
+    "morning-briefing",
+    "해외영업"
+  ]
+}
