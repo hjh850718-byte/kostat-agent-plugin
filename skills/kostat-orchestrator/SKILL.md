@@ -99,6 +99,26 @@ POP3 폴링/사용자 입력/파일 감지 등에서 트리거를 식별하고,
 
 ---
 
+## Task 의존성 그래프 (Cross-Team Dependency Graph)
+
+Team 내부/Team 간 의존관계를 명시한다. 병렬 실행 가능한 구간과, 반드시 순차 실행해야 하는 구간(Gen/Eval Loop 등)을 구분한다.
+
+```
+PO PDF 수신    ──► Team A (PO-US ∥ Doc-Translate ∥ Calendar)     ──┐
+HK/Amkor PO    ──► Team A' (HK-PO ∥ Doc-Translate)                ──┤
+OOR 수신       ──► Team B (OOR ∥ Validator)                       ──┼──► Team D
+Commission     ──► Commission-Gen ──► Commission-Eval (순차)       ──┤   (EOD-Retro
+                                                                      │    → Memory-Ticket)
+(당일 세션 내 모든 완료/실패 Task 기록) ────────────────────────────┘
+```
+
+- **∥ (fan-out)**: 동일 트리거 내 병렬 실행 가능. 서로 결과를 기다리지 않음.
+- **→ (순차)**: Commission-Eval은 Commission-Gen 산출물이 있어야 검증 가능 → 반드시 순차.
+- **Team D는 항상 종속**: EOD-Retro는 그날 실행된 모든 Team(A/A'/B/C)의 `task-status.json` 결과를 취합한 뒤에만 시작한다. 즉 Team D는 세션 종료 트리거가 오더라도 진행 중인 Task가 있으면 해당 Task 완료(또는 timeout 처리)까지 대기한다.
+- 이 그래프는 새 Team을 추가할 때마다 갱신한다 (예: Team E 추가 시 Team D 앞에 연결선 추가).
+
+---
+
 ## 병렬 실행 명령 포맷
 
 Orchestrator는 각 Task를 아래 포맷으로 호출한다:
@@ -155,6 +175,20 @@ pending → running → completed
 - Task 완료 시: 진행 상태 업데이트
 - 전체 완료 시: 취합 결과 1회 발송
 - 에러 발생 시: 즉시 알림 + 수동 처리 권장
+
+### 실행 지표 (Success Metrics)
+
+Orchestrator의 병렬 처리가 실제로 효과적인지 판단하기 위한 목표치. `task-status.json` 타임스탬프로 측정한다.
+
+| 지표 | 목표 | 측정 방법 |
+|------|------|----------|
+| Task 병렬 처리 효율 | 팀 동시 실행 총 소요시간 < 개별 순차 합산의 60% | Team A/B 각 Task 시작·종료 시각 비교 |
+| Task 완료율 | 재시도 포함 95% 이상 | `task-status.json` 성공/실패(`failed_final`) 카운트 |
+| 알림 지연 | Task 완료 → Telegram 발송까지 5분 이내 | 발송 타임스탬프 − 완료 타임스탬프 |
+| EOD 취합 정확도 | 당일 처리 트리거 100% 반영 | EOD 회고 vs `task-status.json` 대조 |
+| Human Gate 응답 | Validator 에러 발견 시 자동 진행 0건 (항상 사용자 확인) | `decisions.md` 기록 건수 |
+
+지표가 목표를 벗어나면(예: 병렬 효율 60% 미달) Team 구성 또는 동시 실행 제한(현재 4개)을 재검토한다.
 
 ---
 
