@@ -10,7 +10,7 @@
     {
       "name": "kostat-agent",
       "source": ".",
-      "description": "KOSTAT 해외영업 자동화 — PO PDF 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑 등 11개 스킬",
+      "description": "KOSTAT 해외영업 자동화 — PO PDF 입력, OOR Bring Forward 분석, 커미션 인보이스 생성, EOD KPT 회고, 아침 브리핑, 보고서 3인 팀 등 12개 스킬",
       "version": "1.0.0",
       "author": {
         "name": "한준희"
