@@ -144,11 +144,19 @@ Task1/Task2 모두 공유하는 입력 데이터를 먼저 수집:
 
 ### 최종 저장
 
-Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저장:
+Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저장. **Notion과 Obsidian(git 볼트) 양쪽에 동일 내용을 저장한다 — 하나만 저장하고 끝내지 않는다.**
 
-- **저장 경로**: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
+- **Notion 저장**: 기존 "🔁 KPT 업무 회고" DB(`일일업무 일지` 폴더 하위)에 페이지 생성
+- **Obsidian/wiki 저장**: 이 저장소(`kostat-agent-plugin`)의 `wiki/kpt/KPT_YYYY-MM-DD.md`에 저장
+  - frontmatter: `type: summary`, `tags: [kpt]`, `updated: YYYY-MM-DD`, `sources: [Notion 페이지 URL]`
+  - 저장 후 `wiki/index.md`에 링크 추가, `wiki/log.md`에 한 줄 append
+  - 로컬 PC 세션이면 볼트 폴더가 이미 작업 폴더이므로 바로 파일 쓰기; 클라우드/원격 세션이면 git으로 커밋·푸시까지 완료해야 "저장 완료"로 간주한다
 - **날짜 포맷**: `2026.06.02 (화 저녁)` — 요일 정확성
 - Memory Ticket 자동 발행 (Lessons에서 CLAUDE.md 업데이트 후보 발견 시)
+
+> 과거에는 `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\` 로컬 경로에만 저장했으나,
+> 이 경로는 특정 Windows PC에서만 접근 가능해 원격/클라우드 세션에서는 저장이 누락되는
+> 문제가 있었다. 이제는 위 git 기반 `wiki/kpt/` 경로를 표준 저장 위치로 사용한다.
 
 ---
 
@@ -163,7 +171,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
    - **Try**: 구체적인 개선 액션 (추상적 표현 금지)
 3. **Lessons Learned — AI 작업 비효율 기록**
 4. **내일 First Action** — 3~5개 액션, 🔴/🟠/🟡 긴급도 표시
-5. **저장** — `KPT_YYYY-MM-DD.md` 형식, Notion 업무일지 하위에도 생성
+5. **저장** — `KPT_YYYY-MM-DD.md` 형식. Notion 업무일지 하위 + 이 저장소 `wiki/kpt/KPT_YYYY-MM-DD.md` 양쪽에 동일 내용 저장 (자세한 규칙은 위 "최종 저장" 절 참고)
 
 ## Lessons Learned 섹션 작성 기준
 
@@ -232,14 +240,16 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] Task 2 (Lessons): CLAUDE.md 업데이트 후보 식별 완료
 - [ ] Serial Step: 내일 First Action 3~5개 구체화 완료
 - [ ] Serial Step: 🔴/🟠/🟡 긴급도 표시 정확
-- [ ] 최종 저장 경로 정확: `KPT\KPT_YYYY-MM-DD.md`
+- [ ] Notion 저장 완료 (KPT 업무 회고 DB)
+- [ ] Obsidian/wiki 저장 완료: `wiki/kpt/KPT_YYYY-MM-DD.md` + `wiki/index.md`/`wiki/log.md` 갱신
 - [ ] Memory Ticket 연동 완료 (CLAUDE.md 업데이트 후보 있을 경우)
 
 ## 검증 체크리스트 (Standalone 모드)
 - [ ] Keep/Problem/Try 각 섹션 최소 2~3개 항목 충족
 - [ ] Lessons Learned 섹션 기록 완료 (비효율 없어도 1줄)
 - [ ] 내일 First Action 3~5개 구체화 완료 (추상적 표현 금지)
-- [ ] 저장 경로 정확: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
+- [ ] Notion 저장 완료 (KPT 업무 회고 DB)
+- [ ] Obsidian/wiki 저장 완료: `wiki/kpt/KPT_YYYY-MM-DD.md` + `wiki/index.md`/`wiki/log.md` 갱신
 - [ ] 날짜 포맷 일치 (`2026.06.02 (화 저녁)`)
 
 ## 검증 루프 절차
