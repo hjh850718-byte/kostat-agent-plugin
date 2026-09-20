@@ -47,6 +47,8 @@ Excel  한글  Calendar
 
 **작업 순서**:
 1. **PO PDF 읽기** — PDF에서 PO#, Cust PN, Need By Date, Ship To, Remarks, TEMP 등 추출
+   - 기본은 Read 도구로 직접 읽기. 표가 다단/병합 셀로 깨져 필드가 누락되면 `opendataloader-pdf`로 재추출(hybrid/OCR 모드)
+   - 상세 설치·CLI·JSON 매핑: [references/pdf-extraction-tool.md](references/pdf-extraction-tool.md)
 2. **Kostat PN 확인** — 기존 행에서 동일한 Cust PN 검색 → MFG SITE 참조 (신규 PN이면 'KR' 기본값)
 3. **PO# 중복 체크** — 중복 시 사용자 확인 후 진행 (자동 덮어쓰기 금지)
 4. **Excel 신규 행 추가** — 가장 최근 날짜 다음 행에 삽입, 녹색 하이라이트
@@ -108,7 +110,7 @@ Excel  한글  Calendar
 사용자 직접 요청 시 기존 7단계 순차 실행:
 
 ### Step 1~6: 순차 처리
-1. PO PDF 읽기 → 필드 추출
+1. PO PDF 읽기 → 필드 추출 (표 깨짐 시 opendataloader-pdf 재추출 — [references/pdf-extraction-tool.md](references/pdf-extraction-tool.md))
 2. Kostat PN 확인 (기존 행 참조 → MFG SITE)
 3. PO# 중복 체크 (중복 시 사용자 확인)
 4. Excel 신규 행 추가 (녹색 하이라이트)
