@@ -1,0 +1,26 @@
+{
+  "note": "이 파일은 Plugin Hook 설정 참조입니다. 실제 Hook 등록은 settings.json에서 이루어집니다. kostat-eod 전용 — 하루 시작/종료 루틴에만 관여합니다.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "description": "사용자 메시지에서 업무종료 키워드 실시간 감지 → flag 파일 기록",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-detector.py\"",
+        "timeout": 5
+      }
+    ],
+    "SessionStart": [
+      {
+        "description": "EOD 재접속 감지 (6시 이후 회고 제안)",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-sessionstart.py\"",
+        "timeout": 5
+      }
+    ],
+    "Stop": [
+      {
+        "description": "EOD 세션 로깅 + pending_retro flag",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-stop.py\"",
+        "timeout": 5
+      }
+    ]
+  }
+}
