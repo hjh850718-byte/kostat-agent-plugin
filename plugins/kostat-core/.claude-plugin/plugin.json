@@ -1,0 +1,18 @@
+{
+  "name": "kostat-core",
+  "description": "KOSTAT 해외영업 자동화 공통 인프라 — Orchestrator, 메모리 로더, Human Gate 승인, 자동 백업, Trace 로깅, 작업공간 라우팅. 다른 모든 kostat-* 플러그인의 필수 의존성입니다.",
+  "version": "1.0.0",
+  "author": {
+    "name": "한준희",
+    "email": ""
+  },
+  "homepage": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "repository": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "kostat",
+    "orchestrator",
+    "core",
+    "해외영업"
+  ]
+}

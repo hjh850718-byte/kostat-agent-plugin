@@ -1,0 +1,18 @@
+{
+  "name": "kostat-oor",
+  "description": "KOSTAT 주간 OOR(Open Order Report) Bring Forward 분석 및 정리. kostat-core 플러그인과 함께 설치해야 합니다.",
+  "version": "1.0.0",
+  "author": {
+    "name": "한준희",
+    "email": ""
+  },
+  "homepage": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "repository": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "kostat",
+    "oor",
+    "open-order-report",
+    "해외영업"
+  ]
+}

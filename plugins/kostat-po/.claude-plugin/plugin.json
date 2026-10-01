@@ -1,0 +1,20 @@
+{
+  "name": "kostat-po",
+  "description": "KOSTAT 미국/홍콩 PO(Purchase Order) 자동 업데이트 — PO PDF → Excel 입력. kostat-core 플러그인과 함께 설치해야 합니다.",
+  "version": "1.0.0",
+  "author": {
+    "name": "한준희",
+    "email": ""
+  },
+  "homepage": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "repository": "https://github.com/hjh850718-byte/kostat-agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "kostat",
+    "po-management",
+    "skyworks",
+    "qualcomm",
+    "xview",
+    "해외영업"
+  ]
+}
