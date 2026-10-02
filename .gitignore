@@ -20,6 +20,7 @@ outputs/
 # Environment
 .env
 .env.local
+.env.kimi
 
 # IDE
 .vscode/
