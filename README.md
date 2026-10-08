@@ -168,6 +168,15 @@ kostat-agent-plugin/
 
 ---
 
+## Claude 시작하기
+
+이 플러그인은 [Claude Code](https://claude.ai/referral/XXXXXXXX)가 필요합니다.
+아직 계정이 없다면 아래 링크로 가입하세요:
+
+👉 **[Claude 가입하기](https://claude.ai/referral/XXXXXXXX)**
+
+---
+
 ## 버전
 
 현재 버전: 2.0.0 (단일 플러그인 → 5개 플러그인 마켓플레이스 구조로 개편)
