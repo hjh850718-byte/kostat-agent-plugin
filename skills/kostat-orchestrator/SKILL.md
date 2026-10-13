@@ -142,14 +142,62 @@ Orchestrator는 각 Task를 아래 포맷으로 호출한다:
 ```
 pending → running → completed
                  → failed (→ retry → failed_final)
-                 → timeout
+                 → timeout → 중단(재개 대상)
+running → 대기(승인) → (승인) running / (거부) 취소
 ```
+
+### 체크포인트 (단계 단위 결과 보존)
+
+Task는 단계(step) 단위로 실행하고, 단계가 끝날 때마다 결과를 `task-status.json`의 `tasks[task_id].steps`에 기록한다.
+
+```json
+"PO-TASK1-20260608-01": {
+  "skill": "kostat-po-update",
+  "task_number": 1,
+  "status": "failed",
+  "steps": {
+    "read_pdf":      {"status": "completed", "output": {"po_number": "PO12345"}},
+    "excel_insert":  {"status": "completed", "output": {"row": 412}},
+    "remarks_check": {"status": "failed", "error": "Remarks 형식 불일치"}
+  },
+  "timestamp": "2026-06-08 14:32:10"
+}
+```
+
+- **재시도 시** `completed` 단계는 건너뛰고, 저장된 `output`을 그대로 재사용한다. 미완료 단계만 다시 실행한다.
+- 다른 Task의 `output`은 참조하지 않는다. 독립 Task 원칙(컨텍스트 공유 금지)은 유지한다.
+- **기록 주체**: 각 에이전트가 Task 결과 JSON에 `steps`를 담아 반환하고, `orchestrator_bridge.py`가 `task-status.json`에 기록한다. `kostat-handoff-writer` hook은 기존대로 파일 완성 신호만 기록한다.
+- `task-status.json`은 세션 시작 시 초기화되므로(`kostat-ai-bridge`), **세션 간 재개에는 쓰지 않는다**. 세션 간 재개는 아래 "재개 규칙"의 `current-plan.md`를 쓴다.
 
 ### 제한
 - Task 타임아웃: 10분
-- 재시도: 1회 (동일 Task 재실행)
-- 전체 팀 타임아웃: 15분
+- 재시도: 1회. 완료된 단계는 건너뛰고, 제한시간은 `min(10분, 팀 잔여 시간)`으로 한다
+- 재시도 생략 조건: 팀 잔여 시간이 2분 미만이면 재시도하지 않고 `[중단(타임아웃)]`으로 표기한다
+- 전체 팀 타임아웃: 25분 (= Task 타임아웃 10분 × 2 + 여유 5분)
 - 동시 실행 Task 수: 최대 4개 (리소스 제한)
+
+---
+
+## 재개 규칙 (대기·중단 Task 이어가기)
+
+Orchestrator는 `current-plan.md`의 Task 상태를 아래 표기로 기록한다.
+
+| 상태 | 표기 | 의미 |
+|------|------|------|
+| 대기 | `[대기]` | 아직 시작하지 않음 |
+| 진행중 | `[진행중]` | 실행 중 |
+| 완료 | `[완료 HH:MM]` | 모든 단계 완료 |
+| 대기(승인) | `[대기(승인)]` | Human Gate 확인 필요 (예: PO# 중복) |
+| 중단(타임아웃) | `[중단(타임아웃)]` | 제한시간 초과, 완료 단계는 보존됨 |
+| 실패 | `[실패]` | 재시도 후에도 실패 |
+
+**다음 호출 시 동작**
+1. `current-plan.md`를 읽는다.
+2. `[대기]`, `[중단(타임아웃)]` Task는 pending으로 보고, `task-status.json`의 체크포인트부터 이어간다. 이미 `[완료]`인 Task는 재실행하지 않는다 (중복 등록 방지).
+3. `[대기(승인)]` Task는 `decisions.md`에 승인 기록이 있을 때만 재개한다. 기록이 없으면 사용자에게 다시 질문한다.
+4. 세션 종료 시 `[대기]`, `[중단]`, `[대기(승인)]` 항목은 EOD 전달의 `open_loops`에 넣는다.
+
+---
 
 ### 알림
 - Task 완료 시: 진행 상태 업데이트
@@ -162,11 +210,11 @@ pending → running → completed
 
 | 에러 유형 | 처리 |
 |----------|------|
-| 단일 Task 실패 | 재시도 1회 → 실패 시 해당 Task 스킵 + 알림 |
+| 단일 Task 실패 | 재시도 1회 (완료 단계 건너뜀, 잔여 예산 내) → 실패 시 `[실패]` 표기 + 알림 |
 | 2개 이상 Task 실패 | 전체 중단 → Telegram 긴급 알림 |
-| Validator 에러 발견 | 사용자 확인 요청 (자동 진행 금지) |
+| Validator 에러 발견 | `[대기(승인)]` 표기 후 사용자 확인 요청 (자동 진행 금지) |
 | API 키 없음 | 해당 Task 스킵 + 환경설정 안내 |
-| 타임아웃 | 강제 종료 → 부분 결과로 처리 |
+| 타임아웃 | 강제 종료 → 완료 단계 보존 → `[중단(타임아웃)]` 표기 → 다음 호출 때 재개 |
 
 ---
 
@@ -220,7 +268,7 @@ pending → running → completed
 |------|------|------|------|
 | `current-plan.md` | 모든 에이전트 | Orchestrator | 트리거 감지 즉시 |
 | `decisions.md` | 모든 에이전트 | Orchestrator | Human Gate 결정 시 |
-| `task-status.json` | Orchestrator | kostat-handoff-writer hook | Write 작업 완료 시 자동 |
+| `task-status.json` | Orchestrator | kostat-handoff-writer hook(파일 완성) + orchestrator_bridge(단계 `steps`) | Write 완료 / 단계 완료 시 |
 | `session-context.md` | Orchestrator, EOD 스킬 | kostat-ai-bridge hook | 세션 시작/종료 자동 |
 | `agent-handoffs/*.md` | 다음 에이전트 | kostat-handoff-writer hook | Write 작업 완료 시 자동 |
 
@@ -289,6 +337,7 @@ KOSTAT_HANDOFF=on              # handoff-writer hook 활성화
 
 ```python
 import json
+import sys
 from pathlib import Path
 import os
 
@@ -316,7 +365,9 @@ def run_handoff_mode(classification_result):
                 break
         time.sleep(2)
     else:
-        raise TimeoutError("current-plan.md 작성 타임아웃")
+        # 계획 파일 미작성 → direct 모드로 폴백 (제한사항과 동일)
+        sys.stderr.write("[handoff] current-plan.md 타임아웃 → direct 모드 폴백\n")
+        return run_direct_mode(classification_result)
 
     # task-status.json 에 시작 기록
     status = json.loads(status_file.read_text(encoding="utf-8")) if status_file.exists() else {}
