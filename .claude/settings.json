@@ -1,4 +1,11 @@
 {
+  "disabledMcpjsonServers": [
+    "mobbin",
+    "nicelydone",
+    "refero",
+    "lazyweb",
+    "inspoai"
+  ],
   "hooks": {
     "PostToolUse": [
       {

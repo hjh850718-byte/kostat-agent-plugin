@@ -38,6 +38,9 @@ kostat-agent-plugin/
 ├── scripts/                          ← 실행 스크립트
 │   └── kostat-team.sh                ← tmux 멀티탭 팀 실행
 ├── docs/                             ← 참고 자료 (설계 문서 등)
+├── .mcp.json                         ← MCP 서버 정의 (UI 디자인 5개 — 기본 비활성)
+├── .env.example                      ← MCP 토큰/키 변수명 (값은 .env에 입력)
+├── .claude/settings.json             ← disabledMcpjsonServers로 UI MCP 기본 비활성
 ├── CLAUDE.md                         ← 이 파일
 ├── package.json                      ← 저장소(레포) 버전
 └── README.md                         ← 설치/사용법

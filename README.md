@@ -109,6 +109,23 @@ cp -r kostat-agent-plugin/plugins/kostat-po/* ~/.claude/plugins/kostat-po/
 
 ---
 
+## 선택 기능: UI 디자인 MCP
+
+사내 대시보드·제안서 화면 등 UI 작업을 할 때만 쓰는 선택 기능입니다.
+PO/OOR/커미션 업무와는 무관하며, 기본적으로 **비활성화**되어 있어 필요한 서버만 골라 켤 수 있습니다.
+
+| 서버 | 용도 | 무료 여부 |
+|------|------|-----------|
+| Mobbin | 앱 화면·플로우 레퍼런스 | 유료 |
+| Nicelydone | SaaS 플로우·컴포넌트 | 유료 |
+| Refero | 설계 규칙(DESIGN.md) | 무료 |
+| Lazyweb | A/B 근거·리서치 | 부분 무료 |
+| InspoAI | 아이콘 SVG·스크린 | 무료 티어 |
+
+> 설치·활성화 방법: [docs/11. UI 디자인 MCP 설치 가이드.md](docs/11.%20UI%20디자인%20MCP%20설치%20가이드.md)
+
+---
+
 ## Hook 스크립트
 
 ### kostat-core (8개 — 모든 업무 공통)
