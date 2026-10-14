@@ -146,8 +146,13 @@ Task1/Task2 모두 공유하는 입력 데이터를 먼저 수집:
 
 Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저장:
 
-- **저장 경로**: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
+- **저장 경로**: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md` (fanout·standalone 공통)
 - **날짜 포맷**: `2026.06.02 (화 저녁)` — 요일 정확성
+- **날짜 기준 upsert (필수)**:
+  1. 저장 전 같은 날짜의 KPT 파일 존재 확인
+  2. 없음 → 신규 생성
+  3. 있음 → **덮어쓰기 금지**. 각 섹션에 추가 항목만 append (하루 중 재실행·EOD 재감지 시 중복 방지)
+- **Notion 연동**: 업무일지 하위에도 동일 내용 생성 (보조 복사본)
 - Memory Ticket 자동 발행 (Lessons에서 CLAUDE.md 업데이트 후보 발견 시)
 
 ---
@@ -163,7 +168,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
    - **Try**: 구체적인 개선 액션 (추상적 표현 금지)
 3. **Lessons Learned — AI 작업 비효율 기록**
 4. **내일 First Action** — 3~5개 액션, 🔴/🟠/🟡 긴급도 표시
-5. **저장** — `KPT_YYYY-MM-DD.md` 형식, Notion 업무일지 하위에도 생성
+5. **저장** — `KPT_YYYY-MM-DD.md` 형식. 경로·upsert 규칙은 [최종 저장](#최종-저장)과 동일
 
 ## Lessons Learned 섹션 작성 기준
 
@@ -233,6 +238,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] Serial Step: 내일 First Action 3~5개 구체화 완료
 - [ ] Serial Step: 🔴/🟠/🟡 긴급도 표시 정확
 - [ ] 최종 저장 경로 정확: `KPT\KPT_YYYY-MM-DD.md`
+- [ ] 날짜 기준 upsert 적용 (기존 파일 있으면 append, 덮어쓰기 없음)
 - [ ] Memory Ticket 연동 완료 (CLAUDE.md 업데이트 후보 있을 경우)
 
 ## 검증 체크리스트 (Standalone 모드)
@@ -240,6 +246,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] Lessons Learned 섹션 기록 완료 (비효율 없어도 1줄)
 - [ ] 내일 First Action 3~5개 구체화 완료 (추상적 표현 금지)
 - [ ] 저장 경로 정확: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
+- [ ] 날짜 기준 upsert 적용 (기존 파일 있으면 append, 덮어쓰기 없음)
 - [ ] 날짜 포맷 일치 (`2026.06.02 (화 저녁)`)
 
 ## 검증 루프 절차

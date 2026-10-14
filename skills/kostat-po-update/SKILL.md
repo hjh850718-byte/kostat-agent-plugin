@@ -48,12 +48,12 @@ Excel  한글  Calendar
 **작업 순서**:
 1. **PO PDF 읽기** — PDF에서 PO#, Cust PN, Need By Date, Ship To, Remarks, TEMP 등 추출
 2. **Kostat PN 확인** — 기존 행에서 동일한 Cust PN 검색 → MFG SITE 참조 (신규 PN이면 'KR' 기본값)
-3. **PO# 중복 체크** — 중복 시 사용자 확인 후 진행 (자동 덮어쓰기 금지)
+3. **PO# 중복 체크** — 중복 발견 시 Excel 추가 없이 `status: "waiting_approval"`(대기(승인))로 반환하고 종료 (자동 덮어쓰기 금지)
 4. **Excel 신규 행 추가** — 가장 최근 날짜 다음 행에 삽입, 녹색 하이라이트
 5. **Remarks 형식 검증** (`"Cust PN: | Need By: | $"` 패턴 강제)
 6. **TEMP 처리** — 빈 값이면 빈칸 유지 + 알림
 
-**출력**: `{po_number, customer, qty, ship_date, kostat_pn, status: "ok" | "dup" | "error"}`
+**출력**: `{po_number, customer, qty, ship_date, kostat_pn, status: "ok" | "waiting_approval" | "error"}`
 
 > 상세 대상 파일 경로·필드 매핑·MFG SITE 규칙: [references/field-mapping.md](references/field-mapping.md)
 
@@ -75,7 +75,7 @@ Excel  한글  Calendar
 
 **담당**: PO 납기일을 Google Calendar에 등록
 
-**입력**: PO PDF에서 추출한 납기 관련 정보
+**입력**: Task 1 출력의 `ship_date` (Task 1이 `status: "waiting_approval"`이면 Task 3 스킵 — 승인 전 미추가 PO의 납기 등록 금지)
 
 **우선순위 색상 판단**:
 - Need By Date 기준 오늘 + 14일 이내 → 🔴 긴급
@@ -99,6 +99,13 @@ Excel  한글  Calendar
 - 재시도 실패 → Telegram 에러 알림 + 수동 처리 권장
 - 2개 이상 실패 → Orchestrator에 에러 보고 → 전체 중단
 
+**중복 PO 발견 시 (status: "waiting_approval") — 대기(승인) 기록**:
+- Excel·Calendar 변경 없음 (승인 전 추가 금지)
+- `current-plan.md`에 `[대기(승인)] PO# {po_number} 중복 — 승인 시 추가` 한 줄 기록 (Orchestrator 재개 규칙과 동일)
+- 사용자에게 알림: "PO# {po_number} 중복 — 추가 보류, 승인하시면 추가합니다" (Telegram)
+- 재개 조건: 사용자 승인이 `decisions.md`에 기록된 경우에만 Task 1을 다시 실행해 행을 추가하고 Task 3를 이어간다. 승인 기록이 없으면 다시 질문만 하고 대기 유지
+- 종료
+
 > 상세 Telegram 포맷: [references/field-mapping.md](references/field-mapping.md)
 
 ---
@@ -110,7 +117,7 @@ Excel  한글  Calendar
 ### Step 1~6: 순차 처리
 1. PO PDF 읽기 → 필드 추출
 2. Kostat PN 확인 (기존 행 참조 → MFG SITE)
-3. PO# 중복 체크 (중복 시 사용자 확인)
+3. PO# 중복 체크 (중복 발견 시 추가하지 않고 `[대기(승인)]` 기록 후 사용자에게 알리고 종료)
 4. Excel 신규 행 추가 (녹색 하이라이트)
 5. Remarks 형식 검증 (`"Cust PN: | Need By: | $"` 패턴)
 6. TEMP 처리
@@ -122,7 +129,7 @@ Excel  한글  Calendar
 ## 검증 루프 절차
 
 1. 체크리스트 실행 → 실패 항목 발견 시 원인 분석 → 수정 → 재검증 (최대 3회)
-2. **Fan-out 모드**: 3개 Task는 서로 독립적 — 컨텍스트 공유 금지
+2. **Fan-out 모드**: Task 2는 독립 — 에이전트 간 컨텍스트 공유 금지. 단 Task 3는 Task 1의 출력(ship_date)을 입력으로 받는 데이터 의존 관계 — Task 1이 `waiting_approval`이면 Task 3는 스킵
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
 > 상세 검증 체크리스트·주의사항: [references/field-mapping.md](references/field-mapping.md)
