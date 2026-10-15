@@ -4,7 +4,7 @@
 
 | 하고 싶은 일 | 스킬 | 참고 문서 |
 |---|---|---|
-| 미국 PO 입력 | `kostat-po-update` | 03. PO Eval 테스트 케이스, `kostat-oor-weekly/references/column-map.md` |
+| 미국 PO 입력 | `kostat-po-update` | 03. PO Eval 테스트 케이스, `kostat-po-update/references/field-mapping.md` |
 | 홍콩(Xview) PO 입력 | `kostat-hk-po-update` | `kostat-hk-po-update/references/xview-mapping.md` |
 | 주간 OOR 정리 | `kostat-oor-weekly` | `kostat-oor-weekly/references/column-map.md` |
 | 월간 커미션 인보이스 | `kostat-commission-invoice` | `kostat-commission-invoice/references/rate-tables.md` |
