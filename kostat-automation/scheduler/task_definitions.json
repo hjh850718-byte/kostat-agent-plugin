@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "owner": "한준희 과장",
+    "team": "KOSTAT 해외영업부",
+    "log_dir": "C:\\Users\\USER\\Desktop\\77. CLOUDE 정리용\\logs",
+    "claude_work_dir": "C:\\Users\\USER\\Documents\\Claude\\AGENT"
+  },
+  "tasks": [
+    {
+      "name": "KOSTAT_MorningBriefing",
+      "description": "매일 오전 8:10 모닝 브리핑 — 읽기 전용",
+      "schedule": {
+        "frequency": "DAILY",
+        "time": "08:10",
+        "day_of_week": null,
+        "day_of_month": null
+      },
+      "claude_prompt": "/morning",
+      "approval_gate": false,
+      "approval_type": null,
+      "telegram_on_start": false,
+      "telegram_on_complete": true,
+      "retry_count": 3,
+      "timeout_minutes": 10
+    },
+    {
+      "name": "KOSTAT_OOR_WeeklyCheck",
+      "description": "매주 월요일 9:00 OOR 수신 여부 확인 — 읽기 전용",
+      "schedule": {
+        "frequency": "WEEKLY",
+        "time": "09:00",
+        "day_of_week": "MON",
+        "day_of_month": null
+      },
+      "claude_prompt": "이번 주 OOR 수신 여부 확인. 미수신 시 담당자 리스트 출력",
+      "approval_gate": false,
+      "approval_type": null,
+      "telegram_on_start": false,
+      "telegram_on_complete": true,
+      "retry_count": 3,
+      "timeout_minutes": 10
+    },
+    {
+      "name": "KOSTAT_CommissionInvoice",
+      "description": "매월 1일 오전 9:00 커미션 인보이스 리마인드 — 읽기 전용",
+      "schedule": {
+        "frequency": "MONTHLY",
+        "time": "09:00",
+        "day_of_week": null,
+        "day_of_month": 1
+      },
+      "claude_prompt": "전월 커미션 인보이스 생성 리마인드. RAW DATA 파일 존재 여부 확인 후 보고",
+      "approval_gate": false,
+      "approval_type": null,
+      "telegram_on_start": false,
+      "telegram_on_complete": true,
+      "retry_count": 3,
+      "timeout_minutes": 10
+    },
+    {
+      "name": "KOSTAT_EOD_Retrospective",
+      "description": "매일 오후 6:30 EOD 회고 초안 생성 — Notion 저장 전 승인 필요",
+      "schedule": {
+        "frequency": "DAILY",
+        "time": "18:30",
+        "day_of_week": null,
+        "day_of_month": null
+      },
+      "claude_prompt": "업무끝",
+      "approval_gate": true,
+      "approval_type": "write",
+      "approval_prompt": "📝 EOD 회고 초안을 생성하고 Notion 임시 저장합니다.\n계속 진행할까요? (Y/N)\n⏱️ 60초 내 응답 없으면 자동 실행됩니다.",
+      "approval_timeout_seconds": 60,
+      "approval_default": "Y",
+      "telegram_on_start": true,
+      "telegram_on_complete": true,
+      "retry_count": 3,
+      "timeout_minutes": 15
+    }
+  ]
+}
