@@ -92,3 +92,11 @@ description: "/memory-ticket 명령어로 새 Memory Ticket 발행. 학습/판�
 - [ ] evidence에 구체적 근거 포함됨
 - [ ] 저장 금지 목록 포함 여부 검사 완료
 - [ ] 저장 경로 정확
+
+## Evidence 적용
+공통 정의·보고 형식·쓰기 게이트: [references/output-contract.md](references/output-contract.md)
+
+- **trustLabel 매핑**: ✅ 확인됨·🧮 계산됨 근거 → `confirmed`(재현 가능한 계산은 `validated`), ❓ 추정 → `proposed`. ⛔ 미확인은 기존 "절대 저장 금지(미확인 추정값)" 규칙대로 발행하지 않는다.
+- `evidence` 필드는 라벨 접두어로 시작: `[확인됨] 6000046947.pdf p1 …` / `[계산됨] 2.48% = 124/5000 …` / `[추정] 동일 패턴 3회 (날짜…)`. 접두어 없는 evidence는 검증 실패.
+- `trustLabel: confirmed|validated`인데 evidence가 `[추정]`이면 불일치 → 발행 중단.
+- 검증 체크리스트 추가: [ ] evidence 라벨 접두어 존재 [ ] trustLabel과 접두어 일치

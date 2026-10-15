@@ -34,6 +34,7 @@ kostat-agent-plugin/
 ├── skills/external/                  ← 플러그인이 아닌 별도 워크스페이스(AGENT)로 수동 동기화되는 외부 스킬 4개
 │   ├── skill-creator/, superpowers/, context-optimization/, frontend-design/
 │   └── (상세: 아래 "External Skills" 절 참고 — plugins/ 마켓플레이스와 무관)
+├── references/output-contract.md     ← 스킬 공통 Evidence 출력 계약 (원본; 각 스킬 references/에 사본, scripts/sync-output-contract.sh)
 ├── raw-sources/ , wiki/              ← 세컨드 브레인 볼트 (아래 별도 절 참고 — Plugin 소스와 무관)
 ├── scripts/                          ← 실행 스크립트
 │   └── kostat-team.sh                ← tmux 멀티탭 팀 실행
@@ -46,6 +47,15 @@ kostat-agent-plugin/
 각 `plugins/kostat-*/`는 그 자체로 완결된 Claude Code Plugin입니다(`.claude-plugin/plugin.json` 보유).
 `kostat-po`, `kostat-oor`, `kostat-commission`, `kostat-eod`는 모두 `kostat-core`가 제공하는
 Human Gate·자동 백업·Trace 로깅에 의존하므로, **kostat-core 없이 단독 설치하지 않습니다.**
+
+## 작업 원칙 (REA AGENTS.md 구조 참고)
+- **근거 구분**: 보고·입력 값은 `확인됨`/`계산됨`/`추정`/`미확인`으로 구분. 모르는 값은 비워 두고 `미확인` 표기 (임의 보정 금지). 필드별 적용은 각 SKILL.md "Evidence 적용" 섹션
+- **Fail-closed**: 고객사, PO#, 금액, 납기 중 하나라도 식별이 불확실하면 파일에 쓰지 않고 사용자에게 확인
+- **쓰기 전 계획 제시**: Excel/설정 변경 전 "무엇을 어디에 쓸지"를 먼저 보여주고 승인 후 실행 (gateguard Human Gate와 동일 취지)
+- **추가적·멱등적 변경**: 같은 PO를 두 번 처리해도 중복 행이 생기지 않아야 하며, 수정 전 백업(autobackup) 유지
+- **입력 보존**: 원본 파일명·PO#·금액·날짜는 가공 없이 보존
+- **소유권 단일화**: 컬럼 매핑·요율은 각 스킬 `references/`가 유일한 출처. 공통 출력 계약은 루트 `references/output-contract.md`가 원본이며, 수정 후 `scripts/sync-output-contract.sh` 실행 (`--check`로 사본 일치 검증)
+- 상사 보고용 자료는 항상 2~3개 OPTION과 각 장단점을 함께 제공
 
 ## AUTOMATION 연동 (Level 7 Python 시스템)
 ```

@@ -89,3 +89,10 @@ deprecated → 3회 이상 실패 or 더 나은 스킬로 대체
 - [ ] lifecycle 기준 정확히 적용
 - [ ] 승격/강등 제안 근거 명시
 - [ ] 사용자 액션 필요 항목 확인 표시
+
+## Evidence 적용
+공통 정의·보고 형식·쓰기 게이트: [references/output-contract.md](references/output-contract.md)
+
+- 스킬 상태 평가의 각 지표에 라벨 표기: SKILL.md 존재·수정일·Trace Log 성공률은 ✅/🧮(표본 수 병기), 승격/강등 제안은 ❓ (Memory Ticket `proposed`).
+- Trace Log 표본이 5건 미만이면 성공률은 ❓ "표본 부족"으로 표기하고 강등 제안을 내지 않는다.
+- 리포트 첫 줄에 `✅ n · 🧮 n · ❓ n · ⛔ n` 요약. 스킬 점검 항목에 "Evidence 적용 섹션 존재 여부"와 "출력 필드 라벨 누락" 추가.

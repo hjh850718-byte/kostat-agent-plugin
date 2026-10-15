@@ -143,3 +143,36 @@ while loop_count < MAX_LOOP:
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
 > 상세 검증 체크리스트: [references/rate-tables.md](references/rate-tables.md)
+
+## Evidence 적용
+공통 정의·보고 형식·쓰기 게이트: [references/output-contract.md](references/output-contract.md)
+
+### 필드별 라벨 기준
+
+| 필드 | ✅ 확인됨 | 🧮 계산됨 | ❓ 추정 | ⛔ 미확인 |
+|------|----------|----------|--------|----------|
+| RAW DATA 행 (고객사, 기간, 매출액, 커미션액) | 시트/행 명시 | — | — | 셀 비어 있음/숫자 파싱 실패 |
+| 목표 커미션 금액 | 사용자 입력 또는 RAW 값 | — | — | 미제공 (요율 역산 불가) |
+| 요율 | 요율표(`rate-tables.md`)에 정의 | `commission ÷ sales` 역산 (입력 모두 ✅) | 요율표에 없고 역산 근거도 불충분 | 입력 ⛔ |
+| 개별/합계 금액, SUMMARY 수치 | — | 합산·곱셈 (반올림 규칙 명시) | — | 입력 ⛔ |
+| 통화·천단위 표기 | 요율표/기존 인보이스 서식 | — | — | — |
+
+### Generator / Evaluator 분담
+- **Generator 출력**: 모든 금액·요율 필드를 `{value, label, source|formula}`로 내보낸다. 요율은 반드시 🧮 역산식과 입력(매출액, 커미션액)을 함께 기록.
+- **Evaluator는 Generator의 label을 신뢰하지 않는다.** 독립 컨텍스트에서 RAW DATA로 🧮 값을 재계산해 일치(±0.01%, 금액은 센트 단위)를 확인하고, `확인됨`으로 표기된 값이 실제 RAW 셀과 같은지 대조한다. 라벨 위조/오표기는 실패 항목.
+- 인보이스 파일에는 ❓/⛔ 값을 쓰지 않는다. 요율이 ❓이면 인보이스 초안 생성을 멈추고 사용자에게 요율 확인을 요청한다 (임의 반올림·요율 보정 금지).
+- 루프 재생성 시 이전 피드백에 "어떤 필드의 어떤 라벨이 왜 실패했는지"를 포함.
+
+### Evaluator 출력 JSON 확장
+```json
+{"verdict": "pass|fail",
+ "label_audit": {"unlabeled": 0, "source_mismatch": 0, "recompute_mismatch": 0},
+ "failures": [{"field": "ATP.rate", "reason": "재계산 2.48% ≠ 기재 2.50%", "label_claimed": "계산됨"}]}
+```
+
+### 검증 체크리스트 추가
+- [ ] 요율 전부 🧮(식·입력 기록) 또는 ✅(요율표 출처)
+- [ ] 합계 = 개별 합 (재계산 일치), SUMMARY 교차 일치
+- [ ] RAW 행 수 = 반영 건수 (누락 행은 ⛔로 보고)
+- [ ] ❓/⛔ 값이 인보이스 파일에 0건
+- [ ] Evaluator 재계산이 Generator 값과 독립적으로 수행됨
