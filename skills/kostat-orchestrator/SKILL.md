@@ -344,3 +344,13 @@ def run_handoff_mode(classification_result):
 - 인간의 판단이 필요한 작업(Gate)은 항상 사용자에게 에스컬레이션
 - Orchestrator가 다운되어도 개별 스킬은 standalone 모드로 동작 가능 (fallback)
 - Handoff 모드에서 `current-plan.md` 미작성 시 60초 후 타임아웃 → `direct` 모드로 fallback
+
+## Evidence 적용
+공통 정의·보고 형식·쓰기 게이트: [references/output-contract.md](../../references/output-contract.md)
+
+- **라벨 집계**: 각 Task 결과의 `counts`(확인됨/계산됨/추정/미확인)를 합산해 최종 Telegram 첫 줄에 한 번만 보고. 하위 스킬이 라벨 없는 결과를 반환하면 해당 Task는 `needs_review`로 처리.
+- **상태 확장**: Task 상태에 `needs_review` 추가 — `completed`와 구분되며 재시도 대상이 아니다 (재시도해도 원본 정보는 늘지 않음). 사용자에게 ❓/⛔ 목록을 전달하고 응답 대기.
+- **자동 실행(POP3/Task Scheduler)**: 사람이 없으므로 `추정/미확인`은 쓰지 않고 보류 → 취합 알림 한 번.
+- **Validator 에러**: 기존 "사용자 확인 요청" 규칙과 동일하게 `needs_review`로 에스컬레이션.
+- **Handoff 모드**: `current-plan.md`의 완료 작업 항목에 `counts`를 기록 (에이전트는 읽기만).
+- **Trace Log**: `근거요약` 속성에 `✅ n · 🧮 n · ❓ n · ⛔ n` 기록 (docs/05 참조).
