@@ -99,3 +99,6 @@ Excel       한국어
 4. 3회 초과 실패 → 해당 Task 스킵 + 에러 알림
 
 > 상세 검증 체크리스트·주의사항: [references/xview-mapping.md](references/xview-mapping.md)
+
+## 출력 계약
+공통 규칙은 `references/output-contract.md` 참조: 근거 라벨(확인됨/계산됨/추정/미확인) 표기, 불확실 시 중단, 쓰기 전 변경 계획 승인, 재처리 시 중복 금지.

@@ -22,8 +22,9 @@ kostat-agent-plugin/
 │   └── kostat-tal/
 ├── scripts/                      ← 실행 스크립트
 │   └── kostat-team.sh            ← tmux 멀티탭 팀 실행
-├── hooks/                        ← Hook Python 스크립트 9개 + hooks.json
-├── docs/                         ← 참고 자료 (설계 문서 등)
+├── hooks/                        ← Hook Python 스크립트 11개 + hooks.json
+├── references/                   ← 스킬 공용 참조 (출력 계약 등)
+├── docs/                         ← 참고 자료 (index.md = 업무별 안내)
 ├── CLAUDE.md                     ← 이 파일
 ├── package.json                  ← 버전/의존성
 └── README.md                     ← 설치/사용법
@@ -68,3 +69,12 @@ AUTOMATION/
 - `ORCHESTRATOR_ENGINE=claude`: Claude Code subprocess 실행 (fanout 모드)
 - `.env`에서 ENGINE 전환 가능
 - Task 타임아웃: 10분, 재시도: 1회, 동시 실행: 최대 4개
+
+## 작업 원칙 (REA AGENTS.md 구조 참고)
+- **근거 구분**: 보고·입력 값은 `확인됨`(원본 PDF/Excel에 있음) / `계산됨`(수식·요율 역산) / `추정` / `미확인`으로 구분. 모르는 값은 비워 두고 `미확인`으로 표기 (임의 보정 금지). 상세: `references/output-contract.md`
+- **Fail-closed**: 고객사, PO#, 금액, 납기 중 하나라도 식별이 불확실하면 파일에 쓰지 않고 사용자에게 확인
+- **쓰기 전 계획 제시**: Excel/설정 변경 전 "무엇을 어디에 쓸지"를 먼저 보여주고 승인 후 실행 (gateguard Human Gate와 동일 취지)
+- **추가적·멱등적 변경**: 같은 PO를 두 번 처리해도 중복 행이 생기지 않아야 하며, 수정 전 백업(autobackup) 유지
+- **입력 보존**: 원본 파일명·PO#·금액·날짜는 가공 없이 보존하고 변경 이력은 별도 기록
+- **소유권 단일화**: 컬럼 매핑·요율은 `references/`가 유일한 출처. SKILL.md에 값을 중복 기재하지 않고 링크
+- 상사 보고용 자료는 항상 2~3개 OPTION과 각 장단점을 함께 제공

@@ -101,3 +101,6 @@ Excel       검증 리포트
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
 > 상세 검증 체크리스트: [references/column-map.md](references/column-map.md)
+
+## 출력 계약
+공통 규칙은 `references/output-contract.md` 참조: 근거 라벨(확인됨/계산됨/추정/미확인) 표기, 불확실 시 중단, 쓰기 전 변경 계획 승인, 재처리 시 중복 금지.
