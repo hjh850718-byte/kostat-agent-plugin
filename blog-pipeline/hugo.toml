@@ -1,0 +1,98 @@
+# Korea-Asia Business Bridge — Hugo 기본 설정
+# Hugo 0.120+ 기준 (hugo.toml 형식)
+
+baseURL       = "https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/"
+languageCode  = "ko-KR"
+title         = "Korea-Asia Business Bridge"
+theme         = "PaperMod"   # git submodule로 추가 필요
+paginate      = 10
+enableRobotsTXT = true
+enableEmoji   = true
+
+[params]
+  description  = "반도체 부품 무역 · APAC 해외영업 실무 인사이트"
+  author       = "Korea-Asia Business Bridge"
+  keywords     = ["반도체 무역", "APAC 영업", "해외영업", "B2B", "반도체 부품"]
+  defaultTheme = "auto"          # 다크/라이트 모드 자동
+  ShowReadingTime    = true
+  ShowShareButtons   = true
+  ShowPostNavLinks   = true
+  ShowBreadCrumbs    = true
+  ShowCodeCopyButtons = true
+  ShowToc            = true
+  TocOpen            = false
+  comments           = false     # Disqus 등 필요 시 활성화
+
+  # Google AdSense — 승인 후 아래 값을 채워라
+  # AdSense 자동 광고는 <head>에 삽입되는 스니펫으로 처리
+  googleAdSenseId = ""           # ca-pub-XXXXXXXXXXXXXXXX
+
+  [params.homeInfoParams]
+    Title   = "Korea-Asia Business Bridge"
+    Content = "반도체 부품 무역과 APAC 해외영업의 모든 것 — 실무자가 쓴 실무 인사이트"
+
+  [[params.socialIcons]]
+    name = "github"
+    url  = "https://github.com/YOUR_GITHUB_USERNAME"
+
+  [[params.socialIcons]]
+    name = "email"
+    url  = "mailto:YOUR_EMAIL"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]   # JSON: 검색 기능(Fuse.js) 용
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true   # HTML 블록 허용 (AdSense 스크립트 삽입 시 필요)
+  [markup.highlight]
+    style          = "github"
+    lineNos        = false
+    codeFences     = true
+    guessSyntax    = true
+
+[taxonomies]
+  category = "categories"
+  tag      = "tags"
+  series   = "series"
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name       = "홈"
+    url        = "/"
+    weight     = 1
+  [[menu.main]]
+    identifier = "posts"
+    name       = "포스트"
+    url        = "/posts/"
+    weight     = 2
+  [[menu.main]]
+    identifier = "categories"
+    name       = "카테고리"
+    url        = "/categories/"
+    weight     = 3
+  [[menu.main]]
+    identifier = "tags"
+    name       = "태그"
+    url        = "/tags/"
+    weight     = 4
+  [[menu.main]]
+    identifier = "about"
+    name       = "소개"
+    url        = "/about/"
+    weight     = 5
+
+# sitemap 생성 설정
+[sitemap]
+  changefreq = "daily"
+  priority   = 0.5
+  filename   = "sitemap.xml"
+
+# robots.txt 규칙
+[privacy]
+  [privacy.googleAnalytics]
+    disable              = false
+    anonymizeIP          = true
+    respectDoNotTrack    = true
+    useSessionStorage    = false
