@@ -8,6 +8,40 @@
       ],
       "cwd": "/home/user/kostat-agent-plugin",
       "type": "stdio"
+    },
+    "mobbin": {
+      "type": "http",
+      "url": "https://api.mobbin.com/mcp"
+    },
+    "nicelydone": {
+      "type": "http",
+      "url": "https://mcp.nicelydone.club/mcp"
+    },
+    "refero": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "fidgetcoding-refero-mcp"
+      ]
+    },
+    "lazyweb": {
+      "type": "http",
+      "url": "https://www.lazyweb.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${LAZYWEB_MCP_TOKEN}"
+      }
+    },
+    "inspoai": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@inspoai/mcp"
+      ],
+      "env": {
+        "INSPOAI_API_KEY": "${INSPOAI_API_KEY}"
+      }
     }
   }
 }
