@@ -150,6 +150,16 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - **날짜 포맷**: `2026.06.02 (화 저녁)` — 요일 정확성
 - Memory Ticket 자동 발행 (Lessons에서 CLAUDE.md 업데이트 후보 발견 시)
 
+### Slack 게시 — #eod-회고 (저장 후 마지막 단계)
+
+저장이 끝나면 KPT 요약을 Slack **#eod-회고** (채널 ID: `C0CEMCN9NH4`, KOSTAT.INC 워크스페이스 `T0ASLBD4PLY`, 비공개)에 1건 게시:
+
+- 형식: 날짜 + Keep/Problem/Try 각 1~3줄 + 내일 First Action (🔴/🟠/🟡)
+- **게시 금지 정보**: 단가, 금액, 커미션, 견적 수치 (고객사명·PN·수량·납기·일정은 가능)
+- 게시 전 사용자에게 게시 문안을 보여주고 승인받은 뒤 발송 (Human Gate)
+- 채널 이름이 아닌 채널 ID로 지정, 이미 같은 날짜 게시가 있으면 중복 게시 금지
+- Slack 연결 실패 시 게시만 건너뛰고 KPT 파일 저장 결과는 유지, 실패 사실을 사용자에게 보고
+
 ---
 
 ## Standalone 모드 (기존 순차)
@@ -234,6 +244,7 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] Serial Step: 🔴/🟠/🟡 긴급도 표시 정확
 - [ ] 최종 저장 경로 정확: `KPT\KPT_YYYY-MM-DD.md`
 - [ ] Memory Ticket 연동 완료 (CLAUDE.md 업데이트 후보 있을 경우)
+- [ ] Slack #eod-회고 게시 문안 승인 후 게시 (금액·단가·커미션 수치 미포함)
 
 ## 검증 체크리스트 (Standalone 모드)
 - [ ] Keep/Problem/Try 각 섹션 최소 2~3개 항목 충족
