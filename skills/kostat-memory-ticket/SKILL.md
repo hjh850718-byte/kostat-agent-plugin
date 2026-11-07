@@ -18,7 +18,7 @@ model: sonnet
 
 ```json
 {
-  "id": "MT-YYYYMMDD-N",
+  "id": "MT-YYYY-MM-DD-N",
   "timestamp": "2026-06-08T09:00:00+09:00",
   "sourceAgent": "[호출한 스킬명 또는 Worker]",
   "scope": "skill | customer | decision | project | process",
@@ -34,7 +34,7 @@ model: sonnet
 
 | 필드 | 규칙 |
 |------|------|
-| `id` | `MT-YYYYMMDD-N` — N은 당일 순번 (01부터) |
+| `id` | `MT-YYYY-MM-DD-N` — N은 당일 순번 (01부터) |
 | `timestamp` | ISO 8601 +09:00 (한국 시간) |
 | `sourceAgent` | 호출한 스킬명 (kostat-po-update, eod-retrospective 등) |
 | `scope` | 영향 범위 — 하나만 선택 |
@@ -75,7 +75,7 @@ model: sonnet
 
 | ID | 날짜 | scope | 요약 | 상태 |
 |----|------|-------|------|------|
-| MT-20260608-01 | 2026-06-08 | customer | Skyworks 담당자 변경 | pending |
+| MT-2026-06-08-01 | 2026-06-08 | customer | Skyworks 담당자 변경 | pending |
 ```
 
 ## 절대 저장 금지 (검증 필터)
