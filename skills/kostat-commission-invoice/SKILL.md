@@ -1,6 +1,8 @@
 ---
 name: kostat-commission-invoice
 description: "커미션 인보이스 생성 및 검증. 트리거: '커미션', 'commission', 'invoice'. Generator/Evaluator Loop 패턴. 독립 에이전트 교차 검증."
+allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion
+model: sonnet
 ---
 
 # kostat-commission-invoice — Level 6 Generator/Evaluator Loop
@@ -133,6 +135,33 @@ while loop_count < MAX_LOOP:
 - 요율 역산 정확도 재계산
 - SUMMARY 시트 수치 검증
 - 불일치 발견 시 사용자 확인 후 저장
+
+---
+
+## 판정 체계 (Verdict)
+
+"검증 못 한 것"과 "검증해서 문제없는 것"은 다르다. 금액이 걸린 스킬이므로 최종 보고에 아래 판정을 반드시 표기한다.
+
+| 판정 | 의미 |
+|------|------|
+| **PASS** | 4개 검증 항목 전부 실행 + 전부 통과 |
+| **CONCERNS** | 전부 실행, 허용 오차 내 경미한 차이 (사용자 승인 후 저장) |
+| **NOT ASSESSED** | 일부 항목을 **실행하지 못함** (PASS보다 나쁨, FAIL보다는 덜 심각) |
+| **FAIL** | 실행했고 불일치 발견 (재생성 대상) |
+
+**우선순위**: FAIL > NOT ASSESSED > CONCERNS > PASS (가장 나쁜 값이 전체 판정)
+
+**NOT ASSESSED 사유 (반드시 명시)**:
+- RAW DATA 시트 누락 / 열기 실패 (예: ATP 시트 없음)
+- SUMMARY 시트 부재로 교차 검증 불가
+- 요율표 [references/rate-tables.md](references/rate-tables.md)에 해당 고객사 요율이 없음
+- Evaluator가 독립 컨텍스트로 실행되지 못함
+
+**규칙**:
+1. 건너뛴 검증 항목은 보고서에 **항목명으로 명시** ("SUMMARY 교차검증: 미실행 - 시트 없음"). 침묵 금지.
+2. 값이 없을 때 통과 쪽으로 기본 처리 금지 (요율 미등록 = PASS 아님, NOT ASSESSED).
+3. NOT ASSESSED 상태로는 "최종 저장 + Telegram 발송"을 자동 진행하지 않고 사용자 확인을 받는다.
+4. Loop 3회 소진 시에도 판정과 미해결 항목을 함께 에스컬레이션한다.
 
 ---
 

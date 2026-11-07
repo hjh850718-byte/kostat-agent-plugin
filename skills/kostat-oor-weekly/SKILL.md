@@ -1,6 +1,8 @@
 ---
 name: kostat-oor-weekly
 description: "OOR Bring Forward 분석. 트리거: 'OOR', 'Open Order', 'Bring Forward'. Mode: fanout | standalone. ultracode Fan-out 권장."
+allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion
+model: sonnet
 ---
 
 # kostat-oor-weekly — Level 6 Fan-out
@@ -91,6 +93,31 @@ Excel       검증 리포트
 2. **그룹별 검증** — PO#, 납기, Status 교차 검증
 3. **불일치 항목 플래그** — PO# 불일치, 납기 초과 등 별도 표시
 4. **취합 및 저장** — 컬러코딩 완료된 xlsx 출력
+
+---
+
+## 판정 체계 (Verdict)
+
+"불일치 없음"과 "비교하지 못함"을 구분한다. 검증 리포트 헤더에 판정을 표기한다.
+
+| 판정 | 의미 |
+|------|------|
+| **PASS** | 전 행 비교 완료 + Critical 0건 |
+| **CONCERNS** | 전 행 비교 완료 + Warning/Info만 존재 |
+| **NOT ASSESSED** | 비교 대상 일부를 **비교하지 못함** |
+| **FAIL** | Critical(PO# 불일치) 1건 이상 |
+
+**우선순위**: FAIL > NOT ASSESSED > CONCERNS > PASS
+
+**NOT ASSESSED 사유 (건수와 함께 명시)**:
+- F/AS/H/AU 열 중 값이 비어 있어 비교 불가한 행 (예: "AU열 공란 12행 - 납기 지연 미검증")
+- 열 위치가 [references/column-map.md](references/column-map.md)와 달라 매핑 실패
+- 분류 기준(납기/Status)이 없어 긴급·일반·보류 3그룹 중 분류하지 못한 행
+
+**규칙**:
+1. 공란/미매칭 행을 "문제없음"으로 집계하지 않는다. 리포트에 **"미평가 N행"** 을 별도 줄로 표기.
+2. 건너뛴 Task(예: Task 2 실패)는 이름으로 명시하고 부분 보고서를 발송한다.
+3. Task 2의 심각도 집계(Critical/Warning/Info)에 미평가 건수를 함께 표시한다.
 
 ---
 

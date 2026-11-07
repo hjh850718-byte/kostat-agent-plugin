@@ -1,6 +1,8 @@
 ---
 name: kostat-po-update
 description: "PO PDF → Excel 입력. 트리거: 'PO 업데이트', 'PO 입력', PO 번호. Mode: fanout | standalone."
+allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, mcp__Google_Calendar__create_event, mcp__Google_Calendar__list_events
+model: sonnet
 ---
 
 # kostat-po-update — Level 6 Fan-out
@@ -116,6 +118,30 @@ Excel  한글  Calendar
 6. TEMP 처리
 
 ### Step 7: 저장 승인 Gate (Human-in-the-loop — 1회만)
+
+---
+
+## 판정 체계 (Verdict)
+
+Fan-out 3개 Task는 각각 상태를 보고하며, 취합 결과를 "완료"로 뭉뚱그리지 않는다.
+
+| Task | 상태 값 |
+|------|---------|
+| Task 1 Excel | `ok` / `dup` / `error` / **`not_assessed`** |
+| Task 2 한글 요약 | `ok` / `error` / **`not_assessed`** |
+| Task 3 Calendar | `created` / `skipped` / `error` / **`not_assessed`** |
+
+**`not_assessed` = "실행하지 못했거나 결과를 확인하지 못함"** (실패와 다름: 접근 권한/입력 확보가 필요한 상태).
+예: PDF 필드 추출 불가(스캔본), Excel 파일 잠김, Calendar 인증 만료, TEMP 값이 PDF에 없어 판단 불가.
+
+**취합 판정**: FAIL(error 포함) > NOT ASSESSED > CONCERNS(dup 등 사용자 확인 필요) > PASS (가장 나쁜 값 채택)
+
+**규칙**:
+1. Telegram/보고에 **Task별 상태를 각각 표기** (예: "Excel ✅ / 요약 ✅ / Calendar ⚠️ 미처리-인증 만료").
+2. 건너뛴 Task·필드는 이름으로 명시. 침묵 금지.
+3. 필드가 비어 있을 때 임의 기본값 사용 금지 (단, 신규 PN의 MFG SITE 'KR' 기본값은 기존 규칙대로 유지하되 **"기본값 적용"이라고 명시**).
+4. PO# 중복(`dup`)은 자동 덮어쓰기 금지 - 기존 규칙 유지.
+5. 일부 Task만 완료된 경우에도 **부분 보고서**를 발송하고 BLOCKED 항목을 즉시 표면화한다.
 
 ---
 
