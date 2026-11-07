@@ -1,6 +1,8 @@
 ---
 name: kostat-orchestrator
 description: "KOSTAT Orchestrator — 트리거 감지 → 에이전트팀 병렬 소집 → 결과 취합 → EOD 전달. 레벨 7 코어 엔진."
+allowed-tools: Read, Glob, Grep, Write, Bash, Agent, Skill, AskUserQuestion
+model: sonnet
 ---
 
 # kostat-orchestrator — Level 7 Orchestrator
@@ -155,6 +157,29 @@ pending → running → completed
 - Task 완료 시: 진행 상태 업데이트
 - 전체 완료 시: 취합 결과 1회 발송
 - 에러 발생 시: 즉시 알림 + 수동 처리 권장
+
+---
+
+## 판정 체계 (Verdict)
+
+팀 실행 결과는 하위 스킬의 판정을 집계해 보고한다. Task 상태에 **`not_assessed`** 를 추가한다.
+
+```
+pending → running → completed
+                 → failed (→ retry → failed_final)
+                 → timeout
+                 → not_assessed  (실행 불가: 입력/권한/연결 부족)
+```
+
+**집계 판정**: FAIL > NOT ASSESSED > CONCERNS > PASS (하위 스킬 중 가장 나쁜 값)
+
+**규칙**:
+1. 취합 보고(Telegram)에 **Task별 상태를 각각 표기**한다. "전체 완료"로 뭉뚱그리지 않는다.
+2. 일부 Task만 끝나도 **부분 보고서**를 발송하고 BLOCKED/NOT ASSESSED 항목을 즉시 표면화한다.
+3. 타임아웃으로 얻은 "부분 결과"는 미완료 구간을 이름으로 명시한다.
+4. EOD 전달 JSON의 `open_loops`에 NOT ASSESSED 항목을 포함한다 (누락 방지).
+5. 하위 스킬이 판정을 반환하지 않았다면 PASS로 간주하지 않고 NOT ASSESSED로 처리한다.
+6. Orchestrator는 Edit 권한이 없다 (직접 파일 수정 금지 원칙). `.ai-bridge/current-plan.md` 작성 외 쓰기는 각 에이전트에 위임한다.
 
 ---
 

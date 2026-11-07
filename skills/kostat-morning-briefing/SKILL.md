@@ -1,6 +1,8 @@
 ---
 name: kostat-morning-briefing
 description: "/kostat 명령어 실행 시 아침 브리핑 출력. PM Soul Loop 기반 오늘 우선순위 정렬 + Drift 감지."
+allowed-tools: Read, Glob, Grep, Write, Bash, AskUserQuestion, mcp__Gmail__search_threads, mcp__Gmail__get_thread, mcp__Gmail__list_labels, mcp__Gmail__create_label, mcp__Gmail__label_thread
+model: sonnet
 ---
 
 # kostat-morning-briefing
@@ -158,6 +160,26 @@ C:\Users\USER\Desktop\77. CLOUDE 정리용\브리핑로그\Gmail분류_YYYYMMDD.
 
 저장: C:\Users\USER\Desktop\77. CLOUDE 정리용\브리핑로그\Gmail분류_YYYYMMDD.txt
 ```
+
+## 판정 체계 (Verdict)
+
+브리핑의 각 섹션은 **실행 결과를 상태로 표기**한다. "정상"과 "확인 못 함"을 구분한다.
+
+| 섹션 | 상태 값 |
+|------|---------|
+| 컨텍스트 로드 | `ok` / **`not_assessed`** (KOSTAT_MEMORY.md 읽기 실패) |
+| Open Loops | `있음 N건` / `없음` / **`not_assessed`** |
+| Drift 감지 | `정상` / `DRIFT` / **`not_assessed`** (판단 근거 파일 없음) |
+| Gmail 분류 | `N건 처리` / **`not_assessed`** (MCP 미연결 등) |
+
+**규칙**:
+1. Drift는 KOSTAT_MEMORY.md 또는 직전 KPT를 읽지 못했다면 "정상"이 아니라 **"판단 불가"** 로 표기한다.
+2. Open Loops 파일을 못 읽은 경우 "없음"이 아니라 "확인 불가"로 표기한다.
+3. Gmail MCP 미연결 시 기존대로 섹션을 "MCP 미연결"로 표시하되 **브리핑 상단 요약에도 1줄 노출**한다.
+4. 분류 대상 20건 중 일부 조회 실패 시 "N/20건 처리, M건 미처리"로 집계한다.
+5. 메일 삭제(`trash_*`)는 일부러 allowed-tools에서 제외했다. 삭제는 항상 사용자 확인 프롬프트를 거친다.
+
+---
 
 ## 컨텍스트 소스
 

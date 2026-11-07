@@ -1,6 +1,8 @@
 ---
 name: kostat-memory-ticket
 description: "/memory-ticket 명령어로 새 Memory Ticket 발행. 학습/판단 기준 업데이트를 구조화하여 기록."
+allowed-tools: Read, Glob, Grep, Write, Edit, AskUserQuestion
+model: sonnet
 ---
 
 # kostat-memory-ticket
@@ -82,6 +84,26 @@ description: "/memory-ticket 명령어로 새 Memory Ticket 발행. 학습/판�
 - 미확인 추정값 ("아마도~", "~인 것 같음")
 - 원문 트랜스크립트 전체
 - 개인정보 (고객 연락처, 생년월일 등)
+
+## 판정 체계 (Verdict)
+
+저장 전 검증 결과를 판정으로 표기한다. **판정이 PASS가 아니면 파일을 저장하지 않는다** (CONCERNS는 사용자 승인 후 저장).
+
+| 판정 | 의미 |
+|------|------|
+| **PASS** | 체크리스트 전 항목 실행 + 통과 |
+| **CONCERNS** | 전 항목 실행, 경미한 이슈 (예: summary 길이 근접) - 사용자 승인 필요 |
+| **NOT ASSESSED** | 검증을 **실행하지 못한 항목**이 있음 (예: INDEX.md 읽기 실패로 id 중복 체크 불가, 저장 금지 필터 미실행) |
+| **FAIL** | JSON 오류, 필드 값 무효, 저장 금지 항목 포함 |
+
+**우선순위**: FAIL > NOT ASSESSED > CONCERNS > PASS
+
+**규칙**:
+1. "저장 금지 목록 검사"를 실행하지 못했다면 통과로 간주하지 않고 NOT ASSESSED로 처리한다.
+2. id 중복 체크를 위해 기존 티켓 목록을 읽지 못했다면 id를 임의로 부여하지 않는다.
+3. 검증 결과는 사용자에게 항목별로 표시한다 (실행/미실행 구분).
+
+---
 
 ## 검증 체크리스트
 - [ ] JSON 형식 정확 (trailing comma 없음)

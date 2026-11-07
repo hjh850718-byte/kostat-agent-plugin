@@ -1,6 +1,8 @@
 ---
 name: kostat-eod-retrospective
 description: "EOD KPT 회고록 자동 생성. 트리거: '업무끝', 'EOD', '회고', 'KPT'. Mode: fanout | standalone."
+allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Agent, AskUserQuestion, mcp__Notion__notion-create-pages
+model: sonnet
 ---
 
 # kostat-eod-retrospective — Level 6 Fan-out
@@ -241,6 +243,32 @@ Task1 + Task2 + Serial 결과를 병합하여 `KPT_YYYY-MM-DD.md` 파일로 저�
 - [ ] 내일 First Action 3~5개 구체화 완료 (추상적 표현 금지)
 - [ ] 저장 경로 정확: `C:\Users\USER\Desktop\77. CLOUDE 정리용\KPT\KPT_YYYY-MM-DD.md`
 - [ ] 날짜 포맷 일치 (`2026.06.02 (화 저녁)`)
+
+## 판정 체계 (Verdict)
+
+저장 전 최종 보고에 아래 판정을 한 줄로 표기한다.
+
+| 판정 | 의미 |
+|------|------|
+| **PASS** | 체크리스트 전 항목 실행 + 충족 |
+| **CONCERNS** | 전 항목 실행, 일부 미달 (예: Keep 항목 2개 미만) - 미달 항목을 명시하고 저장 |
+| **NOT ASSESSED** | 입력을 확보하지 못해 **일부 섹션을 작성/검증하지 못함** |
+| **FAIL** | 저장 경로·날짜 포맷 등 필수 조건 위반 (수정 후 재검증) |
+
+**우선순위**: FAIL > NOT ASSESSED > CONCERNS > PASS
+
+**NOT ASSESSED 사유 (섹션명과 함께 명시)**:
+- `logs/` 접근 불가 → "처리 건수: 미집계"
+- 직전 KPT 파일 없음 → "직전 KPT 대비: 미평가"
+- 세션 히스토리 일부 누락 → 해당 Task 입력 부족
+- Task 1 또는 Task 2 실패 → 해당 섹션 "미작성" 표기 (부분 KPT 저장)
+
+**규칙**:
+1. 못 구한 정보(처리 건수, 이슈 등)를 추정해서 채우지 않는다. "미집계"로 표기한다.
+2. "비효율 없음" 기록은 **Lessons를 실제로 분석한 뒤에만** 가능하다. 분석하지 못했다면 "비효율 없음"이 아니라 "미평가"로 쓴다.
+3. 3회 Loop 후에도 미달이면 저장은 진행하되, KPT 하단에 미달 항목과 판정을 남긴다.
+
+---
 
 ## 검증 루프 절차
 1. **체크리스트 1회 실행** — 위 항목 순차 점검

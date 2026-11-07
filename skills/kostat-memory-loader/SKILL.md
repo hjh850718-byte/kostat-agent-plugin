@@ -1,6 +1,8 @@
 ---
 name: kostat-memory-loader
 description: "KOSTAT 컨텍스트 로드. 트리거: '컨텍스트 로드', '메모리 로드'. 세션 시작 시 자동."
+allowed-tools: Read, Glob, Grep
+model: sonnet
 ---
 
 # kostat-memory-loader
@@ -13,6 +15,22 @@ description: "KOSTAT 컨텍스트 로드. 트리거: '컨텍스트 로드', '메
 - 세션 시작 시 자동 로드
 - 사용자가 "컨텍스트 로드해줘" 요청 시
 - 새로운 작업공간 전환 시
+
+## 판정 체계 (Verdict)
+
+로드 결과를 세션 시작 시 한 줄로 보고한다.
+
+| 대상 | 상태 값 |
+|------|---------|
+| KOSTAT_MEMORY.md | `loaded` / **`not_loaded`** (필수 - 실패 시 NOT ASSESSED) |
+| Plugin CLAUDE.md | `loaded` / `not_loaded` |
+
+**규칙**:
+1. 경로가 없거나 읽기 실패 시 조용히 넘어가지 않고 "컨텍스트 미로드: <파일명> - <사유>"를 출력한다.
+2. MEMORY.md 미로드 상태에서는 고객사·경로·루틴을 **기억에서 추정하지 않는다** (사용자에게 경로 확인 요청).
+3. 선별 로드한 참고 자료는 목록으로 남겨 무엇을 읽지 않았는지 알 수 있게 한다.
+
+---
 
 ## 검증 체크리스트 (Loop 방식)
 - [ ] MEMORY.md 로드 완료 (필수)

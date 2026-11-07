@@ -1,6 +1,8 @@
 ---
 name: kostat-skill-check
 description: "/skill-check 명령어로 스킬 상태 점검. Skill Lifecycle (candidate→trial→promoted→deprecated) 관리."
+allowed-tools: Read, Glob, Grep, Bash
+model: sonnet
 ---
 
 # kostat-skill-check
@@ -74,6 +76,23 @@ deprecated → 3회 이상 실패 or 더 나은 스킬로 대체
 | candidate → trial | SKILL.md 존재 + 1회 사용됨 |
 | promoted → deprecated | 최근 5회 중 3회 실패 |
 | trial → deprecated | 30일 이상 미사용 |
+
+## 판정 체계 (Verdict)
+
+사용 횟수·오류 정보는 `logs/` 로그 **추정치**다. 근거 데이터의 유무를 스킬마다 명시한다.
+
+| 스킬별 평가 | 의미 |
+|-------------|------|
+| lifecycle 확정 | 로그 근거로 판정 가능 |
+| **NOT ASSESSED** | 로그 없음/접근 불가 → 사용 횟수·오류 판단 불가 |
+
+**규칙**:
+1. 로그가 없다고 "사용 0회"나 "오류 없음"으로 처리하지 않는다. **"사용 횟수 불명 (로그 없음)"** 으로 표기한다.
+2. NOT ASSESSED 스킬에는 승격/강등 제안을 하지 않는다 (근거 부족 사유를 명시).
+3. 종합 섹션에 `평가 N개 / 미평가 M개`를 별도 줄로 표기한다.
+4. `logs/` 디렉토리 자체를 읽지 못했다면 리포트 상단에 "로그 미확인 - 전 스킬 lifecycle 미확정"을 노출한다.
+
+---
 
 ## 데이터 소스
 
