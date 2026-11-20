@@ -115,7 +115,8 @@ while loop_count < MAX_LOOP:
 ### Phase 3: 최종 저장
 
 - 인보이스 저장 및 Telegram 알림
-- RAW DATA와 함께 PDF 변환 (옵션)
+- PDF 변환 (옵션): `kostat-xlsx-to-pdf` 스킬로 인보이스 xlsx를 `--one-page` 변환
+  - `verify_failed`(수식 오류) 시 PDF 사용 금지 → xlsx 수정 후 재변환
 
 > 상세 저장 경로·Telegram 포맷: [references/rate-tables.md](references/rate-tables.md)
 
