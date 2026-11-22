@@ -10,7 +10,7 @@
 cd "$env:USERPROFILE\Desktop\20261122_체험단자동화"
 
 # 1) 설치 + 예약 등록 + 플래그/경로/MCP 검증 (네이버 1단계만)
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -EnableMusinsa
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -EnableMusinsa -EnableBlog
 #    무신사 계정 있으면 -EnableMusinsa, 블로그 체험단 계정 있으면 -EnableBlog 추가
 
 # 2) 자동화 전용 Edge 프로필에 로그인 (비밀번호는 직접 입력)

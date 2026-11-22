@@ -43,7 +43,7 @@ if (-not (Test-Path "$Root\state.json")) {
     Write-Json "$Root\state.json" ([ordered]@{
         reported     = @()
         applications = @()
-        sites        = [ordered]@{ revu = ''; gangnam = ''; seoulobba = '' }
+        sites        = [ordered]@{ revu = 'https://www.revu.net'; gangnam = 'https://xn--939au0g4vj8sq.net'; seoulobba = 'https://www.seoulouba.co.kr' }
     })
 }
 Add-Result 'state.json' $true '기존 파일 있으면 유지'

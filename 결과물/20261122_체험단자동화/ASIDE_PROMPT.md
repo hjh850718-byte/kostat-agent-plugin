@@ -32,13 +32,13 @@ PowerShell에서:
 
 [3단계: 설치]
   cd $env:USERPROFILE\Desktop\review-trial-src\결과물\20261122_체험단자동화
-  powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -EnableMusinsa
-- 무신사 계정은 있음(확정). 블로그 체험단(레뷰/강남맛집/서울오빠)은 내가 계정이 있다고 확정해 줄 때만 -EnableBlog 를 붙인다.
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -EnableMusinsa -EnableBlog
+- 무신사·레뷰·강남맛집·서울오빠 모두 계정 있음(2026-11-22 확정).
 - 출력된 설치 결과 표를 그대로 보관한다.
 
 [4단계: 로그인 (사람이 할 일)]
   powershell -NoProfile -ExecutionPolicy Bypass -File C:\workspace\review-trial\login.ps1
-- Edge 창이 열리면 "네이버·무신사 로그인(네이버는 로그인 상태 유지 체크) 후 Edge 창을 모두 닫고 알려달라"고 나에게 요청하고 기다린다.
+- Edge 창이 열리면 "네이버·무신사·서울오빠 로그인(네이버는 로그인 상태 유지 체크, 레뷰·강남맛집은 네이버 간편로그인) 후 Edge 창을 모두 닫고 알려달라"고 나에게 요청하고 기다린다.
 - 직접 아이디·비밀번호를 입력하지 않는다.
 
 [5단계: 검증]
