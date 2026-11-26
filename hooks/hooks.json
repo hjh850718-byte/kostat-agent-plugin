@@ -34,6 +34,25 @@
         }
       ]
     },
+    "UserPromptSubmit": [
+      {
+        "description": "EOD 트리거 감지 (업무끝/퇴근 등) → flag + session-log 기록",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-eod-detector.py\"",
+        "timeout": 5
+      },
+      {
+        "description": "프롬프트 → 워크스페이스/스킬 라우팅 힌트",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-workspace-router.py\"",
+        "timeout": 5
+      }
+    ],
+    "PreCompact": [
+      {
+        "description": "/compact 직전 상태 저장 (compaction-log.txt)",
+        "command": "python \"{{PLUGIN_DIR}}/hooks/kostat-compact.py\"",
+        "timeout": 5
+      }
+    ],
     "SessionStart": [
       {
         "description": ".ai-bridge/ 디렉토리 초기화 (current-plan, task-status, session-context)",

@@ -27,3 +27,8 @@ outputs/
 
 # Node
 node_modules/
+
+# Understand-Anything scratch
+.ua/intermediate/
+.ua/tmp/
+.ua/.trash-*/

@@ -52,7 +52,7 @@ Excel       한국어
 
 **출력**: `{po_number, customer, qty, status: "ok" | "dup" | "error"}`
 
-> 상세 대상 파일 경로·필드 매핑·Invoice#/PO# 구분: [references/xview-mapping.md](references/xview-mapping.md)
+> 상세 대상 파일 경로·필드 매핑·Invoice#/PO# 구분: [references/xview-mapping.md](../../references/xview-mapping.md)
 
 ---
 
@@ -77,7 +77,7 @@ Excel       한국어
 - 재시도 실패 → Telegram 에러 알림 + 수동 처리 권장
 - 2개 모두 실패 → 전체 중단 → 긴급 알림
 
-> 상세 Telegram 포맷: [references/xview-mapping.md](references/xview-mapping.md)
+> 상세 Telegram 포맷: [references/xview-mapping.md](../../references/xview-mapping.md)
 
 ---
 
@@ -98,4 +98,4 @@ Excel       한국어
 3. **Fan-out 모드**: 2개 Task는 서로 독립적 — 컨텍스트 공유 금지
 4. 3회 초과 실패 → 해당 Task 스킵 + 에러 알림
 
-> 상세 검증 체크리스트·주의사항: [references/xview-mapping.md](references/xview-mapping.md)
+> 상세 검증 체크리스트·주의사항: [references/xview-mapping.md](../../references/xview-mapping.md)

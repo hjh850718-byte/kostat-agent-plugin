@@ -1,0 +1,1254 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "591f3997a7de5b9cddd9cc7a3f0fce906655aa54",
+  "generatedAt": "2026-11-26T09:55:18.415Z",
+  "files": {
+    ".claude-plugin/marketplace.json": {
+      "filePath": ".claude-plugin/marketplace.json",
+      "contentHash": "df5193283428cc621cbaa96deaf5b9b471865d63fbc3f78e9dae8ef7f3b905f7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    ".claude-plugin/plugin.json": {
+      "filePath": ".claude-plugin/plugin.json",
+      "contentHash": "901aa02a9105aefe1cb0842ce0caa6e5864f982ec0146fe32d136cda53f2c16a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "CLAUDE.md": {
+      "filePath": "CLAUDE.md",
+      "contentHash": "f6da0589a66f848f1488b8173fe8683bde741c30300399a50cc6c16ef3df4cae",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": false
+    },
+    "CONNECTORS.md": {
+      "filePath": "CONNECTORS.md",
+      "contentHash": "f53a9a222241e1702743e12896a5692bf17d3ee3e384071ad93c1c7cd38ef551",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 37,
+      "hasStructuralAnalysis": false
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "539e1dd80b2fb3224870fa14ef2ff360ff6a9ea2b80ae07afc00fea77dfaff26",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 130,
+      "hasStructuralAnalysis": false
+    },
+    "docs/01. Dynamic Workflow 실전 프롬프트.md": {
+      "filePath": "docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "contentHash": "6b700a295ef6ceba3906ce25e0a2f8570038ee4dd7cb8cba15da9bc1781241dc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 158,
+      "hasStructuralAnalysis": false
+    },
+    "docs/03. kostat-po-update Eval 테스트 케이스.md": {
+      "filePath": "docs/03. kostat-po-update Eval 테스트 케이스.md",
+      "contentHash": "c44a862b40725537df8535f8a3fa0c9f7020b89c4827d8cea8b5eccadc472e6a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 175,
+      "hasStructuralAnalysis": false
+    },
+    "docs/04. kostat-eod-retrospective Eval 테스트 케이스.md": {
+      "filePath": "docs/04. kostat-eod-retrospective Eval 테스트 케이스.md",
+      "contentHash": "6578d8ae37f3ee0aa5a0731fb4ad493305b79ad7fd7fefd5826f0d95a991b32a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 88,
+      "hasStructuralAnalysis": false
+    },
+    "docs/05. KOSTAT-AGENT Trace Schema.md": {
+      "filePath": "docs/05. KOSTAT-AGENT Trace Schema.md",
+      "contentHash": "017191dd7b571a07cdb83efb6d793819adee8776ad19018685ad9dddb34cc60c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 113,
+      "hasStructuralAnalysis": false
+    },
+    "docs/06. KOSTAT Managed Agent Console 설계 v1.0.md": {
+      "filePath": "docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+      "contentHash": "589a56c01319438c8bdba8e37ff83cbb631e0ecfbb3f50a19b8b4b80d4d3977e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 389,
+      "hasStructuralAnalysis": false
+    },
+    "docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md": {
+      "filePath": "docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+      "contentHash": "ec7d22c7b2e067f4fb47dadac01fd34ab93242b844e6b0bf03cc6722f5a04aef",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 244,
+      "hasStructuralAnalysis": false
+    },
+    "docs/08. KOSTAT Plugin 패키징 설계.md": {
+      "filePath": "docs/08. KOSTAT Plugin 패키징 설계.md",
+      "contentHash": "abf621ac8ca00b410f430cb8b741704a874bca24d45413da92576416387068df",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 233,
+      "hasStructuralAnalysis": false
+    },
+    "docs/09. Make.com + Claude 자동화 구현 가이드.md": {
+      "filePath": "docs/09. Make.com + Claude 자동화 구현 가이드.md",
+      "contentHash": "a5dca4d4094e213a1d8cb9817e4828cb32706eb12387b27824c5b722213d7347",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 300,
+      "hasStructuralAnalysis": false
+    },
+    "docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md": {
+      "filePath": "docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "contentHash": "9e92f3dde445355d90cec72b1e7317d7ed39ce54c89ef9b86c9f7f22116317c1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 236,
+      "hasStructuralAnalysis": false
+    },
+    "hooks/hooks.json": {
+      "filePath": "hooks/hooks.json",
+      "contentHash": "1014a2e91f811380bb301519cbcf78a48b50e43b7b777e69b4a3c8b796e6eef8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 63,
+      "hasStructuralAnalysis": false
+    },
+    "hooks/kostat-ai-bridge.py": {
+      "filePath": "hooks/kostat-ai-bridge.py",
+      "contentHash": "852e216ffdd604d3e5a33b66b302bf20bfb5a7951bb18b1248a8f3085fcab17b",
+      "functions": [
+        {
+          "name": "get_session_id",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "init_bridge",
+          "params": [],
+          "exported": true,
+          "lineCount": 63
+        },
+        {
+          "name": "finalize_bridge",
+          "params": [],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "get_session_id",
+        "init_bridge",
+        "finalize_bridge",
+        "main"
+      ],
+      "totalLines": 192,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-autobackup.py": {
+      "filePath": "hooks/kostat-autobackup.py",
+      "contentHash": "c1e0605dde532fda09eed235c204e0a36e48381b154cab0f9dbdf015fc64afcc",
+      "functions": [
+        {
+          "name": "get_session_key",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 44
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "shutil",
+          "specifiers": [
+            "shutil"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "get_session_key",
+        "main"
+      ],
+      "totalLines": 68,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-compact.py": {
+      "filePath": "hooks/kostat-compact.py",
+      "contentHash": "ba5326acdecf9bae334bb85183bd5fbed9cdff0403a7464b04779a8e3aec179e",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-eod-detector.py": {
+      "filePath": "hooks/kostat-eod-detector.py",
+      "contentHash": "26ada6860c9b7ab14bf72462e1958c5fe4e4bc2d641ea149637cece6651a7151",
+      "functions": [
+        {
+          "name": "is_pm_session",
+          "params": [],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "detect_eod",
+          "params": [
+            "text"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "write_flag",
+          "params": [
+            "trigger_type"
+          ],
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "is_pm_session",
+        "detect_eod",
+        "write_flag",
+        "main"
+      ],
+      "totalLines": 111,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-eod-sessionstart.py": {
+      "filePath": "hooks/kostat-eod-sessionstart.py",
+      "contentHash": "1b57c45c850eafb4bb952d4c0e7e7ed4453850fa7f7652db86915b2ec6fd4f41",
+      "functions": [
+        {
+          "name": "check_pending_retro",
+          "params": [],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 27
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "check_pending_retro",
+        "main"
+      ],
+      "totalLines": 59,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-eod-stop.py": {
+      "filePath": "hooks/kostat-eod-stop.py",
+      "contentHash": "0780f1001f17d41466ca29eab1020e1fc646c44c852345b945b68af08064179f",
+      "functions": [
+        {
+          "name": "check_flag",
+          "params": [],
+          "returnType": "dict | None",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "check_transcript",
+          "params": [
+            "transcript_path"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "check_eod_done_today",
+          "params": [],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "write_pending_retro",
+          "params": [],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "clear_pending_retro",
+          "params": [],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 40
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "check_flag",
+        "check_transcript",
+        "check_eod_done_today",
+        "write_pending_retro",
+        "clear_pending_retro",
+        "main"
+      ],
+      "totalLines": 134,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-gateguard.py": {
+      "filePath": "hooks/kostat-gateguard.py",
+      "contentHash": "489f1de8c6769f2af3567cbe50b5cac4ea18163244b719ae071d141829880ffd",
+      "functions": [
+        {
+          "name": "safe_encode",
+          "params": [
+            "s"
+          ],
+          "returnType": "bytes",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "get_session_key",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "get_state_file",
+          "params": [],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "load_checked",
+          "params": [],
+          "returnType": "set",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "mark_checked",
+          "params": [
+            "path"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "is_subagent",
+          "params": [
+            "data"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "deny_response",
+          "params": [
+            "file_name"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 48
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "safe_encode",
+        "get_session_key",
+        "get_state_file",
+        "load_checked",
+        "mark_checked",
+        "is_subagent",
+        "deny_response",
+        "main"
+      ],
+      "totalLines": 140,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-handoff-writer.py": {
+      "filePath": "hooks/kostat-handoff-writer.py",
+      "contentHash": "093496cdd609c3f3fac3474bbda6ae9b7f3109a52b3d94a1c90013a11cb9defb",
+      "functions": [
+        {
+          "name": "detect_skill",
+          "params": [
+            "file_path"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "get_session_id",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "_write_handoff_md",
+          "params": [
+            "skill",
+            "file_path",
+            "file_name",
+            "timestamp"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "_update_task_status",
+          "params": [
+            "skill",
+            "file_name",
+            "timestamp"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 42
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "detect_skill",
+        "get_session_id",
+        "_write_handoff_md",
+        "_update_task_status",
+        "main"
+      ],
+      "totalLines": 171,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-observe.py": {
+      "filePath": "hooks/kostat-observe.py",
+      "contentHash": "6a188343f8bcb65b20e8c426109b53dcefeb1dc5bf7d6a37a764484628baba79",
+      "functions": [
+        {
+          "name": "should_capture",
+          "params": [
+            "file_path"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "get_agent_label",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "append_to_wiki",
+          "params": [
+            "file_name",
+            "tool_name"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "should_capture",
+        "get_agent_label",
+        "append_to_wiki",
+        "main"
+      ],
+      "totalLines": 91,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-tracelogger.py": {
+      "filePath": "hooks/kostat-tracelogger.py",
+      "contentHash": "e790d46816f6522355e693daf845ce3892d923c26a960a81dde4d58a521aba15",
+      "functions": [
+        {
+          "name": "get_session_id",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "detect_skill",
+          "params": [
+            "file_path",
+            "tool_input"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "should_capture",
+          "params": [
+            "file_path"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 42
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        }
+      ],
+      "exports": [
+        "get_session_id",
+        "detect_skill",
+        "should_capture",
+        "main"
+      ],
+      "totalLines": 89,
+      "hasStructuralAnalysis": true
+    },
+    "hooks/kostat-workspace-router.py": {
+      "filePath": "hooks/kostat-workspace-router.py",
+      "contentHash": "5c970d628f8e5ffdfb48a304c266ee0a7d56696e34b9c55505178003d940d8ad",
+      "functions": [
+        {
+          "name": "get_session_key",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "read_state",
+          "params": [],
+          "returnType": "dict",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "write_state",
+          "params": [
+            "state"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "is_on_cooldown",
+          "params": [
+            "workspace"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "mark_guided",
+          "params": [
+            "workspace"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "extract_keywords",
+          "params": [
+            "prompt",
+            "max_keywords"
+          ],
+          "returnType": "list",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "match_routing",
+          "params": [
+            "prompt"
+          ],
+          "returnType": "list",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "format_guidance",
+          "params": [
+            "matches",
+            "keywords",
+            "compact_context"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 46
+        },
+        {
+          "name": "try_inject_compact_context",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 45
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "hashlib",
+          "specifiers": [
+            "hashlib"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        }
+      ],
+      "exports": [
+        "get_session_key",
+        "read_state",
+        "write_state",
+        "is_on_cooldown",
+        "mark_guided",
+        "extract_keywords",
+        "match_routing",
+        "format_guidance",
+        "try_inject_compact_context",
+        "main"
+      ],
+      "totalLines": 362,
+      "hasStructuralAnalysis": true
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "e06fdf17aa7c1a30f8cb1a9b165e10d0c1944a73a348b2a7b8cd40c09c212625",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": false
+    },
+    "references/column-map.md": {
+      "filePath": "references/column-map.md",
+      "contentHash": "d9cb8a02733c23e8330f1e19f9db4e97b47f01ea96758381e2eb31fcb4ff7e98",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 100,
+      "hasStructuralAnalysis": false
+    },
+    "references/field-mapping.md": {
+      "filePath": "references/field-mapping.md",
+      "contentHash": "b9ecb2a0048e1394a3e26d35ceddae1550e403aa573354ba66c64c2c58f66f94",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 83,
+      "hasStructuralAnalysis": false
+    },
+    "references/rate-tables.md": {
+      "filePath": "references/rate-tables.md",
+      "contentHash": "26b4f3f1e830d5ce9e2ec1e56655a94b285b91bd2e609b300a0c510aaa979a77",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 104,
+      "hasStructuralAnalysis": false
+    },
+    "references/xview-mapping.md": {
+      "filePath": "references/xview-mapping.md",
+      "contentHash": "6ab66b4ef940d47d20b46ae7a78839450a3f3812711d9403cfec7ca650b49650",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": false
+    },
+    "scripts/kostat-team.sh": {
+      "filePath": "scripts/kostat-team.sh",
+      "contentHash": "b8fd6122756a7aec552089c1c9d7ef58cf54a4711ad7d22c9ba6189dbfa56978",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 64,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-commission-invoice/SKILL.md": {
+      "filePath": "skills/kostat-commission-invoice/SKILL.md",
+      "contentHash": "e55865c6b8702d0f2dc0fb0a28cf9fe8f310b031c5d5de3e0eb02068bce642d9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 146,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-eod-retrospective/SKILL.md": {
+      "filePath": "skills/kostat-eod-retrospective/SKILL.md",
+      "contentHash": "80993af5b841b998926972b3443f5f5991148d3f6b18e72e073dfaa265b61115",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 261,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-hk-po-update/SKILL.md": {
+      "filePath": "skills/kostat-hk-po-update/SKILL.md",
+      "contentHash": "f99318184b7ce916909dd77469bda502c68dc306819d77bbaa6634893550e172",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-memory-loader/SKILL.md": {
+      "filePath": "skills/kostat-memory-loader/SKILL.md",
+      "contentHash": "6b0f674d477c6e497ec81860262c2b9d099164c1af8461e6ae840812e15bac38",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-memory-ticket/SKILL.md": {
+      "filePath": "skills/kostat-memory-ticket/SKILL.md",
+      "contentHash": "9866645e5025edb1f21c618d602721aa65a502d6e7f87f2a02246c30b64eddbd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-morning-briefing/SKILL.md": {
+      "filePath": "skills/kostat-morning-briefing/SKILL.md",
+      "contentHash": "32bea9623f652d01f84a487fa8a6e0a2803fe24cd1edfb1cf7ff75288e837a74",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 179,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-oor-weekly/SKILL.md": {
+      "filePath": "skills/kostat-oor-weekly/SKILL.md",
+      "contentHash": "4929c902697a73a843972b0ddb9893797de4ae797aec869a85159ff0876e2455",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 104,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-orchestrator/SKILL.md": {
+      "filePath": "skills/kostat-orchestrator/SKILL.md",
+      "contentHash": "2450d37e77e83ba60b445f6d43c832991330cbe702eaeac5e7232f6f58524275",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 347,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-po-update/SKILL.md": {
+      "filePath": "skills/kostat-po-update/SKILL.md",
+      "contentHash": "df8c1c3982abab8d86bb14bd9bed79485132af0d1e14ba0c251300c374e58c84",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 129,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-skill-check/SKILL.md": {
+      "filePath": "skills/kostat-skill-check/SKILL.md",
+      "contentHash": "31ed9a1b903724d0d57188df60beda336b52bcf6e0c82f5d1bff409bed9d965c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 92,
+      "hasStructuralAnalysis": false
+    },
+    "skills/kostat-tal/SKILL.md": {
+      "filePath": "skills/kostat-tal/SKILL.md",
+      "contentHash": "80851e5281243f8187f0b2e97839e0b0e99e4331736a018742abdab52a77806a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 43,
+      "hasStructuralAnalysis": false
+    }
+  }
+}

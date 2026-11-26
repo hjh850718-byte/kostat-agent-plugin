@@ -1,0 +1,2744 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "kostat-agent-plugin",
+    "languages": [
+      "json",
+      "markdown",
+      "python",
+      "shell"
+    ],
+    "frameworks": [],
+    "description": "KOSTAT 해외영업부 업무 자동화를 위한 Claude Code 플러그인. PO 업데이트, OOR 주간 리포트, 커미션 인보이스, 모닝 브리핑, EOD 회고 등 KOSTAT 전용 스킬 11개와 Python Hook 스크립트를 제공한다.",
+    "analyzedAt": "2026-11-26T09:54:17.449Z",
+    "gitCommitHash": "591f3997a7de5b9cddd9cc7a3f0fce906655aa54"
+  },
+  "nodes": [
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "플러그인 작업 규칙을 정의하는 프로젝트 지침 문서로, 디렉토리 구조, AUTOMATION(Level 7 Python 시스템) 연동, 소스와 설치 캐시 구분, Windows 호환 Python 호출 규칙, Orchestrator 엔진 전환 규칙을 설명한다.",
+      "tags": [
+        "documentation",
+        "작업-규칙",
+        "orchestrator",
+        "hook",
+        "개발-가이드"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:CONNECTORS.md",
+      "type": "document",
+      "name": "CONNECTORS.md",
+      "filePath": "CONNECTORS.md",
+      "summary": "플러그인이 연동하는 외부 서비스 현황을 정리한 문서로, MCP 서버(Gmail, Google Calendar, Notion, KakaoTalk), 외부 API(Telegram Bot, 관세청 통계), 로컬 파일 경로, 의존 플러그인 목록을 표로 제공한다.",
+      "tags": [
+        "documentation",
+        "커넥터",
+        "mcp",
+        "integration",
+        "외부-서비스"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "플러그인 개요와 설치 방법(GitHub Marketplace/로컬), 11개 스킬 목록과 트리거, 커넥터, Hook 스크립트, 프로젝트 구조를 안내하는 진입 문서이다.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "설치-가이드",
+        "스킬-목록",
+        "overview"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "README는 버전을 1.0.0, Hook 스크립트를 7개로 기재하지만 package.json은 1.4.0이고 hooks/ 디렉토리에는 11개의 Python 스크립트가 있어 문서가 실제 상태보다 뒤처져 있다."
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "kostat-agent 플러그인의 이름, 버전(1.4.0), 설명과 npm scripts를 정의하는 패키지 메타데이터 설정이다.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "버전-관리",
+        "메타데이터"
+      ],
+      "complexity": "simple",
+      "languageNotes": "setup 스크립트가 참조하는 scripts/setup.js는 저장소에 존재하지 않으며, version 스크립트는 실제 버전과 다른 1.0.0을 출력한다."
+    },
+    {
+      "id": "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "type": "document",
+      "name": "01. Dynamic Workflow 실전 프롬프트.md",
+      "filePath": "docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "summary": "OOR Fan-out, 커미션 인보이스 Adversarial Verification, EOD KPT Classify-and-act, PO 일괄 처리 Loop 등 7가지 Dynamic Workflow 패턴별로 Claude Code에 바로 붙여 쓸 수 있는 실전 프롬프트를 모은 문서. ultracode·/goal·/loop 트리거와 토큰 절약 팁, 저장 위치 규칙도 정리한다.",
+      "tags": [
+        "문서",
+        "prompt-engineering",
+        "dynamic-workflow",
+        "fan-out",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/03. kostat-po-update Eval 테스트 케이스.md",
+      "type": "document",
+      "name": "03. kostat-po-update Eval 테스트 케이스.md",
+      "filePath": "docs/03. kostat-po-update Eval 테스트 케이스.md",
+      "summary": "kostat-po-update 스킬(PO PDF → 미국오더 Excel 자동 입력)을 검증하는 10개 Eval 테스트 케이스를 정의한다. 중복 PO# 감지, MFG SITE 참조, TEMP 빈칸 처리, Ship To 주소 정확도, 파일 무결성 등을 검증 매트릭스와 openpyxl 기반 자동화 스크립트 골격으로 제공한다.",
+      "tags": [
+        "eval",
+        "test",
+        "테스트케이스",
+        "po-update",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/04. kostat-eod-retrospective Eval 테스트 케이스.md",
+      "type": "document",
+      "name": "04. kostat-eod-retrospective Eval 테스트 케이스.md",
+      "filePath": "docs/04. kostat-eod-retrospective Eval 테스트 케이스.md",
+      "summary": "kostat-eod-retrospective 스킬(EOD KPT 회고록 자동 생성)의 5개 Eval 테스트 케이스를 정의한다. 세션 유형별 KPT 생성 품질과 Notion 업무일지 하위 페이지 저장을 검증하는 매트릭스와 에지 케이스 체크리스트를 담는다.",
+      "tags": [
+        "eval",
+        "test",
+        "kpt-회고",
+        "notion",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/05. KOSTAT-AGENT Trace Schema.md",
+      "type": "document",
+      "name": "05. KOSTAT-AGENT Trace Schema.md",
+      "filePath": "docs/05. KOSTAT-AGENT Trace Schema.md",
+      "summary": "PostToolUse Hook이 자동 기록하는 KOSTAT-AGENT Trace Log의 Notion Database 스키마(속성 정의, 샘플 레코드, DB 생성 방법)를 정의한다. Write|Edit matcher 기반 trace logger hook 연동 계획(Phase 3)도 포함한다.",
+      "tags": [
+        "schema-definition",
+        "trace-log",
+        "hook",
+        "notion",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+      "type": "document",
+      "name": "06. KOSTAT Managed Agent Console 설계 v1.0.md",
+      "filePath": "docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+      "summary": "Claude Managed Agent(CMA) 기반 KOSTAT 해외영업 전담 에이전트의 Console 설계서로, System Prompt·agent_toolset·Custom Tools·MCP 서버(kostat-email, kostat-excel) 구성과 Environment 설정을 상세히 기술한다. Python SDK의 sessions.create() 호출, Excel 마운트, stream 처리 등 세션 실행 흐름과 데이터 흐름 다이어그램도 제공한다.",
+      "tags": [
+        "architecture",
+        "managed-agent",
+        "mcp",
+        "system-prompt",
+        "documentation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+      "type": "document",
+      "name": "07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+      "filePath": "docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+      "summary": "Managed Agent Console 설계를 System Prompt → MCP 서버 → SDK 호출 흐름 전반에 걸쳐 검토한 아키텍처 리뷰 문서. Excel 경로 의존성(Critical), MCP 호스팅, Custom Tool 동기화, Excel 동시 쓰기 충돌 등 리스크를 등급별로 분석하고 P0~P2 개선 권장사항과 현재/권장 아키텍처를 비교한다.",
+      "tags": [
+        "architecture-review",
+        "risk-analysis",
+        "managed-agent",
+        "mcp",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "type": "document",
+      "name": "08. KOSTAT Plugin 패키징 설계.md",
+      "filePath": "docs/08. KOSTAT Plugin 패키징 설계.md",
+      "summary": "분산 배치된 KOSTAT 스킬과 Hook 스크립트를 Claude Code Plugin으로 패키징하는 설계 문서. plugin.json 메타데이터, hooks.json 기반 Hook 설정 통합(UserPromptSubmit/PreToolUse/PostToolUse/Stop), 설치 방법(GitHub Marketplace·로컬 디렉토리), 마이그레이션 단계와 트레이드오프를 다룬다.",
+      "tags": [
+        "design-doc",
+        "plugin-packaging",
+        "hook",
+        "build-system",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/09. Make.com + Claude 자동화 구현 가이드.md",
+      "type": "document",
+      "name": "09. Make.com + Claude 자동화 구현 가이드.md",
+      "filePath": "docs/09. Make.com + Claude 자동화 구현 가이드.md",
+      "summary": "n8n 대신 Make.com을 기준으로 HTTP 모듈을 통해 Anthropic Claude API를 연결하는 자동화 구현 가이드. 시나리오 모듈 구성(뉴스 수집 → Claude 요약 → Telegram 전송), 프롬프트 작성 원칙, Data Structure 출력 고정, 보안 유의사항, 트러블슈팅과 레벨별 로드맵을 다룬다.",
+      "tags": [
+        "guide",
+        "make-com",
+        "anthropic-api",
+        "no-code-automation",
+        "documentation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "type": "document",
+      "name": "10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "filePath": "docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "summary": "09번 Make.com 구현 가이드를 기반으로 KOSTAT 해외영업 업무에 Make.com을 보완 도입하는 방안을 분석한다. 고객사 뉴스 모니터링, PO 상태 알림, OOR 주간 리포트, 커미션 인보이스 자동화 등 6개 시나리오와 현행 POP3 Watcher 비교, kostat_excel_mcp.py의 HTTP API 확장, 무료 티어 운영 전략을 제시한다.",
+      "tags": [
+        "적용방안",
+        "make-com",
+        "automation-roadmap",
+        "pop3-watcher",
+        "documentation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:references/column-map.md",
+      "type": "document",
+      "name": "column-map.md",
+      "filePath": "references/column-map.md",
+      "summary": "kostat-oor-weekly 스킬이 참조하는 OOR 상세 규칙표로, F/AS열(PO#)·H/AU열(Ship/Req Date) 검증 컬럼 매핑, Bring Forward 분류 및 심각도 기준, 컬러코딩·파일 저장 규칙, 검증 리포트와 Telegram 알림 포맷을 정의한다.",
+      "tags": [
+        "문서",
+        "reference",
+        "oor",
+        "컬럼-매핑",
+        "컬러코딩"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "openpyxl PatternFill 기반 행 단위 색상 적용과 Excel Comment 삽입 규칙을 명시하며, 리포트 템플릿은 {placeholder} 형식의 Markdown 코드 블록으로 제공된다."
+    },
+    {
+      "id": "document:references/field-mapping.md",
+      "type": "document",
+      "name": "field-mapping.md",
+      "filePath": "references/field-mapping.md",
+      "summary": "kostat-po-update 스킬의 미국 오더 PO PDF → Excel 입력 참조 자료로, 대상 파일 경로, PDF 필드-Excel 컬럼 매핑, MFG SITE 기본값 규칙, Remarks 강제 패턴, 중복 PO# 처리, Calendar 일정·Telegram 알림 포맷을 정리한다.",
+      "tags": [
+        "문서",
+        "reference",
+        "po-update",
+        "필드-매핑",
+        "excel"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:references/rate-tables.md",
+      "type": "document",
+      "name": "rate-tables.md",
+      "filePath": "references/rate-tables.md",
+      "summary": "kostat-commission-invoice 스킬의 커미션 요율 역산 공식과 허용 오차, US/ATP/MICRON 시트별 고객사 매핑, 인보이스 포맷, Generator↔Evaluator 간 구조화 JSON 입출력 형식, 저장 경로와 Telegram 알림 포맷을 정의한다.",
+      "tags": [
+        "문서",
+        "reference",
+        "commission",
+        "gen-eval-loop",
+        "요율표"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Gen/Eval Loop 패턴에서 Generator 출력과 Evaluator 피드백(verdict/checks/feedback)의 JSON 계약을 문서로 고정해 두었다."
+    },
+    {
+      "id": "document:references/xview-mapping.md",
+      "type": "document",
+      "name": "xview-mapping.md",
+      "filePath": "references/xview-mapping.md",
+      "summary": "kostat-hk-po-update 스킬이 참조하는 HK PO 필드 매핑 자료로, PO PDF·요약 저장 경로, PDF→Excel 필드 매핑, PO#와 Invoice# 구분 규칙, Telegram 알림 포맷을 담고 있다.",
+      "tags": [
+        "문서",
+        "reference",
+        "hk-po",
+        "필드-매핑",
+        "invoice"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.claude-plugin/marketplace.json",
+      "type": "config",
+      "name": "marketplace.json",
+      "filePath": ".claude-plugin/marketplace.json",
+      "summary": "kostat-agent 플러그인을 단일 플러그인 marketplace로 배포하기 위한 매니페스트로, 소스 경로·버전·라이선스·키워드·카테고리(productivity)를 정의한다.",
+      "tags": [
+        "configuration",
+        "marketplace",
+        "plugin-manifest",
+        "배포"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.claude-plugin/plugin.json",
+      "type": "config",
+      "name": "plugin.json",
+      "filePath": ".claude-plugin/plugin.json",
+      "summary": "Claude Code 플러그인 kostat-agent의 메타데이터(이름, 설명, 버전 1.0.0, 저장소, 라이선스, 키워드)를 선언하는 플러그인 매니페스트.",
+      "tags": [
+        "configuration",
+        "plugin-manifest",
+        "메타데이터",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:hooks/hooks.json",
+      "type": "config",
+      "name": "hooks.json",
+      "filePath": "hooks/hooks.json",
+      "summary": "PreToolUse(Write|Edit), PostToolUse(Write|Edit), SessionStart, Stop 이벤트별로 KOSTAT Python hook 스크립트를 `python \"...\"` 형식으로 등록하는 hook 설정 참조 파일. 실제 등록은 settings.json에서 이루어진다고 명시한다.",
+      "tags": [
+        "configuration",
+        "hook",
+        "이벤트-라우팅",
+        "automation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-ai-bridge.py",
+      "type": "file",
+      "name": "kostat-ai-bridge.py",
+      "filePath": "hooks/kostat-ai-bridge.py",
+      "summary": "SessionStart/Stop hook으로 .ai-bridge/ 디렉토리(current-plan, decisions, task-status, session-context, agent-handoffs)를 초기화하고 세션 종료 시각을 기록해 에이전트 간 상태 공유 기반을 마련한다.",
+      "tags": [
+        "hook",
+        "session-lifecycle",
+        "상태공유",
+        "orchestration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-autobackup.py",
+      "type": "file",
+      "name": "kostat-autobackup.py",
+      "filePath": "hooks/kostat-autobackup.py",
+      "summary": "PreToolUse hook으로 Excel(.xlsx/.xls) 파일을 Write/Edit하기 전에 세션별 백업 디렉토리에 날짜 접미사 사본을 자동 생성한다.",
+      "tags": [
+        "hook",
+        "backup",
+        "excel",
+        "safety"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-compact.py",
+      "type": "file",
+      "name": "kostat-compact.py",
+      "filePath": "hooks/kostat-compact.py",
+      "summary": "PreCompact hook으로 /compact 실행 직전 시각과 상태를 AGENT/docs/compaction-log.txt에 기록한다(ECC pre-compact.js 패턴 이식).",
+      "tags": [
+        "hook",
+        "logging",
+        "compaction",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:hooks/kostat-eod-detector.py",
+      "type": "file",
+      "name": "kostat-eod-detector.py",
+      "filePath": "hooks/kostat-eod-detector.py",
+      "summary": "UserPromptSubmit hook으로 사용자 메시지에서 명시적·묵시적 업무종료 및 회고 의도 키워드를 감지해 eod_detected.flag와 세션 로그를 기록한다.",
+      "tags": [
+        "hook",
+        "eod",
+        "keyword-detection",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-eod-sessionstart.py",
+      "type": "file",
+      "name": "kostat-eod-sessionstart.py",
+      "filePath": "hooks/kostat-eod-sessionstart.py",
+      "summary": "SessionStart hook으로 오후 6시 이후 세션 시작 시 pending_retro flag를 확인해 EOD 회고를 제안하는 additionalContext를 출력한다.",
+      "tags": [
+        "hook",
+        "eod",
+        "session-lifecycle",
+        "회고"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-eod-stop.py",
+      "type": "file",
+      "name": "kostat-eod-stop.py",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "summary": "Stop hook으로 EOD 감지 flag와 transcript를 확인하고, 오늘 회고 미완료 시 pending_retro flag를 기록해 재접속 시 회고 제안을 유도한다.",
+      "tags": [
+        "hook",
+        "eod",
+        "session-lifecycle",
+        "flag-file"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-gateguard.py",
+      "type": "file",
+      "name": "kostat-gateguard.py",
+      "filePath": "hooks/kostat-gateguard.py",
+      "summary": "PreToolUse Human Gate hook으로 세션 내 Excel 파일 최초 수정 시 시트·PO#·중복 확인 등 사전 근거 제시를 요구하며 deny 응답을 반환한다(KOSTAT_GATE=off로 우회).",
+      "tags": [
+        "hook",
+        "guard",
+        "human-in-the-loop",
+        "validation",
+        "excel"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Claude Code PreToolUse hook 프로토콜에 따라 stdin JSON을 읽고 hookSpecificOutput.permissionDecision='deny'를 stdout으로 반환해 도구 호출을 차단한다."
+    },
+    {
+      "id": "file:hooks/kostat-handoff-writer.py",
+      "type": "file",
+      "name": "kostat-handoff-writer.py",
+      "filePath": "hooks/kostat-handoff-writer.py",
+      "summary": "PostToolUse hook으로 스킬 산출물(Excel, KPT, 인보이스 등) Write 시 파일 경로로 스킬을 추정해 .ai-bridge/agent-handoffs/ 핸드오프 문서와 task-status.json을 갱신한다.",
+      "tags": [
+        "hook",
+        "handoff",
+        "orchestration",
+        "상태공유"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-observe.py",
+      "type": "file",
+      "name": "kostat-observe.py",
+      "filePath": "hooks/kostat-observe.py",
+      "summary": "PostToolUse hook으로 Excel·커미션·OOR 등 감시 키워드가 포함된 파일 변경을 에이전트 라벨과 함께 AGENT/docs/wiki.md에 누적 기록한다.",
+      "tags": [
+        "hook",
+        "observability",
+        "logging",
+        "continuous-learning"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-tracelogger.py",
+      "type": "file",
+      "name": "kostat-tracelogger.py",
+      "filePath": "hooks/kostat-tracelogger.py",
+      "summary": "PostToolUse hook으로 감시 대상 파일의 Write/Edit 작업을 추정 스킬명·세션 ID와 함께 JSON Lines 트레이스 로그로 기록한다.",
+      "tags": [
+        "hook",
+        "tracing",
+        "logging",
+        "jsonl"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:hooks/kostat-workspace-router.py",
+      "type": "file",
+      "name": "kostat-workspace-router.py",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "summary": "UserPromptSubmit hook으로 프롬프트 키워드를 라우팅 테이블과 매칭해 적합한 workspace와 KOSTAT Skill을 세션당 1회 안내하고, 이전 compact 요약이 있으면 함께 주입한다.",
+      "tags": [
+        "hook",
+        "router",
+        "keyword-matching",
+        "context-injection"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/kostat-team.sh",
+      "type": "file",
+      "name": "kostat-team.sh",
+      "filePath": "scripts/kostat-team.sh",
+      "summary": "tmux 세션에 orchestrator·po-agent·oor-agent·validator 4개 창을 만들고 각각 Claude Code CLI를 실행해 Level 7 멀티 에이전트 팀을 띄우는 실행 스크립트.",
+      "tags": [
+        "script",
+        "tmux",
+        "multi-agent",
+        "entry-point"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "tmux new-session/new-window + send-keys 조합으로 여러 대화형 CLI 프로세스를 창별로 기동하는 패턴."
+    },
+    {
+      "id": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "document",
+      "name": "kostat-commission-invoice/SKILL.md",
+      "filePath": "skills/kostat-commission-invoice/SKILL.md",
+      "summary": "월간 커미션 인보이스를 Generator/Evaluator Loop(독립 검증 에이전트, Loop-until-done) 또는 standalone 순차 모드로 생성·교차 검증하는 Level 6 스킬 정의.",
+      "tags": [
+        "skill",
+        "commission",
+        "generator-evaluator",
+        "문서"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "document",
+      "name": "kostat-eod-retrospective/SKILL.md",
+      "filePath": "skills/kostat-eod-retrospective/SKILL.md",
+      "summary": "업무종료 트리거 시 KPT 구조화와 Lessons Learned 수집을 2way 병렬 실행한 뒤 내일 First Action을 취합하고 KPT 회고록 저장 및 Memory Ticket 발행까지 수행하는 Level 6 Fan-out 스킬.",
+      "tags": [
+        "skill",
+        "eod",
+        "kpt",
+        "fan-out",
+        "회고"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "document",
+      "name": "kostat-hk-po-update/SKILL.md",
+      "filePath": "skills/kostat-hk-po-update/SKILL.md",
+      "summary": "HK(Amkor) PO PDF를 Excel 업데이트와 한국어 요약 2way 병렬 Task로 처리하고 Synchronization Barrier에서 취합하는 Level 6 Fan-out 스킬.",
+      "tags": [
+        "skill",
+        "po",
+        "fan-out",
+        "excel",
+        "hk"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-memory-loader/SKILL.md",
+      "type": "document",
+      "name": "kostat-memory-loader/SKILL.md",
+      "filePath": "skills/kostat-memory-loader/SKILL.md",
+      "summary": "세션 시작 시 KOSTAT_MEMORY.md와 플러그인 CLAUDE.md를 로드해 사용자 프로필·파일 경로·고객사 컨텍스트를 주입하는 스킬과 검증 루프 규칙.",
+      "tags": [
+        "skill",
+        "context-loading",
+        "memory",
+        "문서"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "document",
+      "name": "kostat-memory-ticket/SKILL.md",
+      "filePath": "skills/kostat-memory-ticket/SKILL.md",
+      "summary": "/memory-ticket 또는 EOD 회고 Phase 3에서 학습·판단 기준 업데이트를 구조화된 Memory Ticket(JSON)으로 발행하고 INDEX를 관리하는 스킬 정의.",
+      "tags": [
+        "skill",
+        "memory",
+        "knowledge-management",
+        "문서"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-morning-briefing/SKILL.md",
+      "type": "document",
+      "name": "kostat-morning-briefing/SKILL.md",
+      "filePath": "skills/kostat-morning-briefing/SKILL.md",
+      "summary": "/kostat 실행 시 컨텍스트 로드, 선택적 Gmail 분류, 오늘 우선순위 브리핑과 Acceptance Criteria 제안을 출력하는 아침 브리핑 스킬.",
+      "tags": [
+        "skill",
+        "briefing",
+        "gmail",
+        "daily-routine"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "document",
+      "name": "kostat-oor-weekly/SKILL.md",
+      "filePath": "skills/kostat-oor-weekly/SKILL.md",
+      "summary": "주간 OOR 파일에서 Bring Forward 항목 추출·Excel 업데이트와 PO# 불일치 검증 리포트를 2way 병렬로 수행하는 Level 6 Fan-out 스킬.",
+      "tags": [
+        "skill",
+        "oor",
+        "fan-out",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "document",
+      "name": "kostat-orchestrator/SKILL.md",
+      "filePath": "skills/kostat-orchestrator/SKILL.md",
+      "summary": "트리거 감지 → 우선순위 기반 에이전트팀(PO/OOR/커미션/EOD) 병렬 소집 → 결과 취합 → EOD 전달을 정의하는 Level 7 Orchestrator 스킬로, .ai-bridge 상태 공유와 handoff 모드를 포함한다.",
+      "tags": [
+        "skill",
+        "orchestrator",
+        "multi-agent",
+        "fan-out",
+        "entry-point"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:skills/kostat-po-update/SKILL.md",
+      "type": "document",
+      "name": "kostat-po-update/SKILL.md",
+      "filePath": "skills/kostat-po-update/SKILL.md",
+      "summary": "PO PDF를 Excel 입력·한국어 요약·Calendar 납기 등록 3way 병렬 Task로 처리하고 저장 전 Human-in-the-loop 승인 Gate를 두는 Level 6 Fan-out 스킬.",
+      "tags": [
+        "skill",
+        "po",
+        "fan-out",
+        "excel",
+        "calendar"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-skill-check/SKILL.md",
+      "type": "document",
+      "name": "kostat-skill-check/SKILL.md",
+      "filePath": "skills/kostat-skill-check/SKILL.md",
+      "summary": "/skill-check로 skills/ 디렉토리를 스캔해 스킬 상태를 평가하고 Skill Lifecycle(candidate→trial→promoted→deprecated) 승격·강등을 제안하는 스킬.",
+      "tags": [
+        "skill",
+        "lifecycle",
+        "inventory",
+        "문서"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-ai-bridge.py:init_bridge",
+      "type": "function",
+      "name": "init_bridge",
+      "filePath": "hooks/kostat-ai-bridge.py",
+      "lineRange": [
+        91,
+        153
+      ],
+      "summary": "SessionStart 시 .ai-bridge/ 및 agent-handoffs/를 생성하고 current-plan·decisions 템플릿을 작성하며 이전 task-status를 날짜별로 보관한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-ai-bridge.py:finalize_bridge",
+      "type": "function",
+      "name": "finalize_bridge",
+      "filePath": "hooks/kostat-ai-bridge.py",
+      "lineRange": [
+        156,
+        167
+      ],
+      "summary": "Stop 시 session-context에 세션 종료 시각을 기록한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-ai-bridge.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-ai-bridge.py",
+      "lineRange": [
+        170,
+        187
+      ],
+      "summary": "stdin hook 이벤트를 읽어 SessionStart/Stop에 따라 init_bridge 또는 finalize_bridge를 호출한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-autobackup.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-autobackup.py",
+      "lineRange": [
+        21,
+        64
+      ],
+      "summary": "Excel Write/Edit 요청을 감지해 원본 파일을 세션 키 기반 백업 디렉토리에 날짜 접미사로 복사한 뒤 입력을 그대로 통과시킨다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-compact.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-compact.py",
+      "lineRange": [
+        15,
+        39
+      ],
+      "summary": "stdin을 읽고 compaction-log.txt에 /compact 발생 시각 엔트리를 추가한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-detector.py:detect_eod",
+      "type": "function",
+      "name": "detect_eod",
+      "filePath": "hooks/kostat-eod-detector.py",
+      "lineRange": [
+        37,
+        55
+      ],
+      "summary": "회고 의도→명시적 종료→(오후) 묵시적 종료 순으로 키워드를 검사해 트리거 타입을 반환한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-detector.py:write_flag",
+      "type": "function",
+      "name": "write_flag",
+      "filePath": "hooks/kostat-eod-detector.py",
+      "lineRange": [
+        58,
+        81
+      ],
+      "summary": "감지된 트리거 정보를 eod_detected.flag JSON으로 쓰고 세션 로그에 이모지 엔트리를 남긴다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-detector.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-eod-detector.py",
+      "lineRange": [
+        84,
+        106
+      ],
+      "summary": "UserPromptSubmit 페이로드에서 사용자 프롬프트를 추출해 EOD를 감지하고 flag를 기록한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-sessionstart.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-eod-sessionstart.py",
+      "lineRange": [
+        28,
+        54
+      ],
+      "summary": "오후 6시 이후이고 pending_retro flag가 있으면 회고 제안 additionalContext를 출력하고 로그를 남긴다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-stop.py:check_flag",
+      "type": "function",
+      "name": "check_flag",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "lineRange": [
+        19,
+        32
+      ],
+      "summary": "UserPromptSubmit hook이 남긴 EOD flag를 읽은 후 삭제하고 데이터를 반환한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-stop.py:check_transcript",
+      "type": "function",
+      "name": "check_transcript",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "lineRange": [
+        35,
+        45
+      ],
+      "summary": "transcript 내용에서 EOD 키워드 존재 여부를 보조적으로 확인한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-stop.py:check_eod_done_today",
+      "type": "function",
+      "name": "check_eod_done_today",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "lineRange": [
+        48,
+        57
+      ],
+      "summary": "오늘 KPT 회고가 이미 완료되었는지 확인한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-stop.py:write_pending_retro",
+      "type": "function",
+      "name": "write_pending_retro",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "lineRange": [
+        60,
+        79
+      ],
+      "summary": "회고 미완료 상태를 pending_retro.flag에 기록해 재접속 시 회고 제안을 가능하게 한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "eod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-eod-stop.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-eod-stop.py",
+      "lineRange": [
+        90,
+        129
+      ],
+      "summary": "Stop 이벤트에서 flag·transcript·완료 여부를 종합해 세션을 로깅하고 pending_retro flag를 기록한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "eod"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-gateguard.py:mark_checked",
+      "type": "function",
+      "name": "mark_checked",
+      "filePath": "hooks/kostat-gateguard.py",
+      "lineRange": [
+        46,
+        57
+      ],
+      "summary": "세션 상태 파일에 파일 경로 해시를 확인 완료로 저장한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-gateguard.py:deny_response",
+      "type": "function",
+      "name": "deny_response",
+      "filePath": "hooks/kostat-gateguard.py",
+      "lineRange": [
+        68,
+        85
+      ],
+      "summary": "수정 전 제시해야 할 근거 목록을 담은 PreToolUse deny JSON 응답을 생성한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-gateguard.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-gateguard.py",
+      "lineRange": [
+        88,
+        135
+      ],
+      "summary": "Excel Write/Edit 중 서브에이전트가 아니고 세션 내 첫 접근인 경우 차단하고, 이후 재시도는 통과시킨다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-handoff-writer.py:_write_handoff_md",
+      "type": "function",
+      "name": "_write_handoff_md",
+      "filePath": "hooks/kostat-handoff-writer.py",
+      "lineRange": [
+        69,
+        100
+      ],
+      "summary": "스킬별·일자별 핸드오프 Markdown 파일에 산출물 정보를 기록한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-handoff-writer.py:_update_task_status",
+      "type": "function",
+      "name": "_update_task_status",
+      "filePath": "hooks/kostat-handoff-writer.py",
+      "lineRange": [
+        103,
+        122
+      ],
+      "summary": "task-status.json에 스킬:파일 키로 완료 상태를 갱신한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-handoff-writer.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-handoff-writer.py",
+      "lineRange": [
+        125,
+        166
+      ],
+      "summary": "Write 이벤트의 파일 경로로 스킬을 판별해 핸드오프 문서와 task-status를 갱신한다(KOSTAT_HANDOFF=off 시 비활성).",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-observe.py:append_to_wiki",
+      "type": "function",
+      "name": "append_to_wiki",
+      "filePath": "hooks/kostat-observe.py",
+      "lineRange": [
+        39,
+        65
+      ],
+      "summary": "파일 변경 정보를 에이전트 라벨·시각과 함께 wiki.md에 추가한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-observe.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-observe.py",
+      "lineRange": [
+        68,
+        86
+      ],
+      "summary": "PostToolUse 페이로드에서 감시 대상 파일 변경을 감지해 wiki에 기록한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-tracelogger.py:detect_skill",
+      "type": "function",
+      "name": "detect_skill",
+      "filePath": "hooks/kostat-tracelogger.py",
+      "lineRange": [
+        22,
+        38
+      ],
+      "summary": "파일 경로와 tool_input 키워드로 OOR/HK PO/커미션/EOD/PO 스킬명을 추정한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-tracelogger.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-tracelogger.py",
+      "lineRange": [
+        44,
+        85
+      ],
+      "summary": "감시 대상 Write/Edit 작업을 세션 ID·스킬명과 함께 일자별 JSONL 트레이스 로그에 기록한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:mark_guided",
+      "type": "function",
+      "name": "mark_guided",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        157,
+        170
+      ],
+      "summary": "세션 상태에 workspace 안내 완료 시각을 기록해 반복 안내를 방지한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:extract_keywords",
+      "type": "function",
+      "name": "extract_keywords",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        187,
+        206
+      ],
+      "summary": "프롬프트를 정규화해 라우팅 매칭용 키워드를 추출한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:match_routing",
+      "type": "function",
+      "name": "match_routing",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        209,
+        234
+      ],
+      "summary": "ROUTING_TABLE의 키워드와 프롬프트를 점수화 매칭해 최적 workspace를 선택한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:format_guidance",
+      "type": "function",
+      "name": "format_guidance",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        237,
+        282
+      ],
+      "summary": "매칭된 workspace 라벨·컨텍스트·추천 Skill 목록을 안내 텍스트로 포맷한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:try_inject_compact_context",
+      "type": "function",
+      "name": "try_inject_compact_context",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        285,
+        306
+      ],
+      "summary": "후보 디렉토리에서 최신 compact 요약 파일을 찾아 2000자 미만이면 반환한다.",
+      "tags": [
+        "helper",
+        "hook",
+        "kostat"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:hooks/kostat-workspace-router.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "hooks/kostat-workspace-router.py",
+      "lineRange": [
+        313,
+        357
+      ],
+      "summary": "쿨다운 확인 후 프롬프트를 라우팅해 안내 메시지를 출력하고 상태를 갱신한다.",
+      "tags": [
+        "hook-handler",
+        "entry-point",
+        "kostat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:skills/kostat-tal/SKILL.md",
+      "type": "document",
+      "name": "SKILL.md",
+      "filePath": "skills/kostat-tal/SKILL.md",
+      "summary": "KOSTAT 업무의 암묵적 판단 규칙(MFG SITE 매핑, Skyworks/Micron/Qorvo 고객사별 특이사항, 데이터 충돌 시 우선순위)을 명문화한 kostat-tal 스킬 정의. 최대 3회 반복하는 검증 체크리스트 Loop 절차와 실패 시 에스컬레이션 규칙을 함께 제공한다.",
+      "tags": [
+        "skill-definition",
+        "판단-기준",
+        "documentation",
+        "검증-루프",
+        "고객사-규칙"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-morning-briefing/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-memory-loader/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-skill-check/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:skills/kostat-tal/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-eod-detector.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-eod-stop.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-gateguard.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-autobackup.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-observe.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-tracelogger.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:hooks/kostat-compact.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:hooks/hooks.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:scripts/kostat-team.sh",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:.claude-plugin/marketplace.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:.claude-plugin/plugin.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:references/rate-tables.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:references/column-map.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:references/field-mapping.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:references/xview-mapping.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:CONNECTORS.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:CLAUDE.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:package.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "config:.claude-plugin/plugin.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "config:hooks/hooks.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:scripts/kostat-team.sh",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "config:package.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONNECTORS.md",
+      "target": "document:skills/kostat-morning-briefing/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONNECTORS.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONNECTORS.md",
+      "target": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONNECTORS.md",
+      "target": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:package.json",
+      "target": "config:.claude-plugin/plugin.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:package.json",
+      "target": "config:.claude-plugin/marketplace.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/03. kostat-po-update Eval 테스트 케이스.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/04. kostat-eod-retrospective Eval 테스트 케이스.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/05. KOSTAT-AGENT Trace Schema.md",
+      "target": "file:hooks/kostat-tracelogger.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/05. KOSTAT-AGENT Trace Schema.md",
+      "target": "config:hooks/hooks.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+      "target": "document:docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "config:.claude-plugin/plugin.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "config:hooks/hooks.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "config:package.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-eod-detector.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-gateguard.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-autobackup.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-observe.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-tracelogger.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-eod-stop.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-compact.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "file:hooks/kostat-workspace-router.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-memory-loader/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:skills/kostat-tal/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:README.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+      "target": "document:CLAUDE.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "target": "document:docs/09. Make.com + Claude 자동화 구현 가이드.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:references/column-map.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:references/field-mapping.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:references/rate-tables.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:references/xview-mapping.md",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-ai-bridge.py",
+      "target": "function:hooks/kostat-ai-bridge.py:init_bridge",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-ai-bridge.py",
+      "target": "function:hooks/kostat-ai-bridge.py:finalize_bridge",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-ai-bridge.py",
+      "target": "function:hooks/kostat-ai-bridge.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-autobackup.py",
+      "target": "function:hooks/kostat-autobackup.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-compact.py",
+      "target": "function:hooks/kostat-compact.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-detector.py",
+      "target": "function:hooks/kostat-eod-detector.py:detect_eod",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-detector.py",
+      "target": "function:hooks/kostat-eod-detector.py:write_flag",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-detector.py",
+      "target": "function:hooks/kostat-eod-detector.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-sessionstart.py",
+      "target": "function:hooks/kostat-eod-sessionstart.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "function:hooks/kostat-eod-stop.py:check_flag",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "function:hooks/kostat-eod-stop.py:check_transcript",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "function:hooks/kostat-eod-stop.py:check_eod_done_today",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "function:hooks/kostat-eod-stop.py:write_pending_retro",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "function:hooks/kostat-eod-stop.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-gateguard.py",
+      "target": "function:hooks/kostat-gateguard.py:mark_checked",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-gateguard.py",
+      "target": "function:hooks/kostat-gateguard.py:deny_response",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-gateguard.py",
+      "target": "function:hooks/kostat-gateguard.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "function:hooks/kostat-handoff-writer.py:_write_handoff_md",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "function:hooks/kostat-handoff-writer.py:_update_task_status",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "function:hooks/kostat-handoff-writer.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-observe.py",
+      "target": "function:hooks/kostat-observe.py:append_to_wiki",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-observe.py",
+      "target": "function:hooks/kostat-observe.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "function:hooks/kostat-tracelogger.py:detect_skill",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "function:hooks/kostat-tracelogger.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:mark_guided",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:extract_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:match_routing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:format_guidance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:try_inject_compact_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "function:hooks/kostat-workspace-router.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "config:.claude-plugin/marketplace.json",
+      "target": "config:.claude-plugin/plugin.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "config:hooks/hooks.json",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-memory-loader/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-morning-briefing/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-skill-check/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-gateguard.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-gateguard.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-autobackup.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-autobackup.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-observe.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-observe.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-tracelogger.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-tracelogger.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-handoff-writer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-handoff-writer.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-ai-bridge.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-ai-bridge.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-eod-sessionstart.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-eod-sessionstart.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-eod-stop.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:hooks/hooks.json",
+      "target": "file:hooks/kostat-eod-stop.py",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:hooks/kostat-eod-stop.py",
+      "target": "file:hooks/kostat-eod-detector.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:hooks/kostat-eod-sessionstart.py",
+      "target": "file:hooks/kostat-eod-stop.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "file:hooks/kostat-ai-bridge.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-handoff-writer.py",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-tracelogger.py",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:hooks/kostat-workspace-router.py",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-hk-po-update/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-commission-invoice/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-morning-briefing/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "document:skills/kostat-skill-check/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "file:hooks/kostat-handoff-writer.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:skills/kostat-orchestrator/SKILL.md",
+      "target": "file:hooks/kostat-ai-bridge.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "target": "document:skills/kostat-memory-ticket/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:skills/kostat-memory-ticket/SKILL.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:skills/kostat-skill-check/SKILL.md",
+      "target": "document:skills/kostat-eod-retrospective/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:skills/kostat-hk-po-update/SKILL.md",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/kostat-team.sh",
+      "target": "document:skills/kostat-orchestrator/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:scripts/kostat-team.sh",
+      "target": "document:skills/kostat-po-update/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:scripts/kostat-team.sh",
+      "target": "document:skills/kostat-oor-weekly/SKILL.md",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude-plugin/plugin.json",
+      "target": "document:skills/kostat-tal/SKILL.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:skills",
+      "name": "스킬 레이어",
+      "description": "PO 업데이트, OOR 주간 리포트, 커미션 인보이스, 모닝 브리핑, EOD 회고 등 KOSTAT 업무 루틴을 Orchestrator·Fan-out·Gen/Eval 패턴으로 정의한 SKILL.md 프롬프트 문서 모음",
+      "nodeIds": [
+        "document:skills/kostat-commission-invoice/SKILL.md",
+        "document:skills/kostat-eod-retrospective/SKILL.md",
+        "document:skills/kostat-hk-po-update/SKILL.md",
+        "document:skills/kostat-memory-loader/SKILL.md",
+        "document:skills/kostat-memory-ticket/SKILL.md",
+        "document:skills/kostat-morning-briefing/SKILL.md",
+        "document:skills/kostat-oor-weekly/SKILL.md",
+        "document:skills/kostat-orchestrator/SKILL.md",
+        "document:skills/kostat-po-update/SKILL.md",
+        "document:skills/kostat-skill-check/SKILL.md",
+        "document:skills/kostat-tal/SKILL.md"
+      ],
+      "containerLabels": [
+        {
+          "name": "주문·정산 Excel 처리",
+          "nodeIds": [
+            "document:skills/kostat-po-update/SKILL.md",
+            "document:skills/kostat-hk-po-update/SKILL.md",
+            "document:skills/kostat-oor-weekly/SKILL.md",
+            "document:skills/kostat-commission-invoice/SKILL.md"
+          ]
+        },
+        {
+          "name": "컨텍스트·메모리 관리",
+          "nodeIds": [
+            "document:skills/kostat-memory-loader/SKILL.md",
+            "document:skills/kostat-memory-ticket/SKILL.md",
+            "document:skills/kostat-tal/SKILL.md"
+          ]
+        },
+        {
+          "name": "일일 업무 루틴",
+          "nodeIds": [
+            "document:skills/kostat-morning-briefing/SKILL.md",
+            "document:skills/kostat-eod-retrospective/SKILL.md"
+          ]
+        },
+        {
+          "name": "오케스트레이션·스킬 점검",
+          "nodeIds": [
+            "document:skills/kostat-orchestrator/SKILL.md",
+            "document:skills/kostat-skill-check/SKILL.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layer:hooks",
+      "name": "Hook 자동화 레이어",
+      "description": "hooks.json에 등록되어 세션 시작/종료, 도구 호출 전후 이벤트에서 EOD 감지, Excel 백업·gateguard, trace 로깅, workspace 라우팅, handoff 상태 공유를 수행하는 Python hook 스크립트",
+      "nodeIds": [
+        "config:hooks/hooks.json",
+        "file:hooks/kostat-ai-bridge.py",
+        "file:hooks/kostat-autobackup.py",
+        "file:hooks/kostat-compact.py",
+        "file:hooks/kostat-eod-detector.py",
+        "file:hooks/kostat-eod-sessionstart.py",
+        "file:hooks/kostat-eod-stop.py",
+        "file:hooks/kostat-gateguard.py",
+        "file:hooks/kostat-handoff-writer.py",
+        "file:hooks/kostat-observe.py",
+        "file:hooks/kostat-tracelogger.py",
+        "file:hooks/kostat-workspace-router.py"
+      ],
+      "containerLabels": [
+        {
+          "name": "EOD 회고 감지",
+          "nodeIds": [
+            "file:hooks/kostat-eod-detector.py",
+            "file:hooks/kostat-eod-sessionstart.py",
+            "file:hooks/kostat-eod-stop.py"
+          ]
+        },
+        {
+          "name": "로깅·관측",
+          "nodeIds": [
+            "file:hooks/kostat-compact.py",
+            "file:hooks/kostat-observe.py",
+            "file:hooks/kostat-tracelogger.py"
+          ]
+        },
+        {
+          "name": "세션 상태 공유",
+          "nodeIds": [
+            "file:hooks/kostat-ai-bridge.py",
+            "file:hooks/kostat-handoff-writer.py"
+          ]
+        },
+        {
+          "name": "Excel 안전장치",
+          "nodeIds": [
+            "file:hooks/kostat-autobackup.py",
+            "file:hooks/kostat-gateguard.py"
+          ]
+        },
+        {
+          "name": "이벤트 라우팅",
+          "nodeIds": [
+            "config:hooks/hooks.json",
+            "file:hooks/kostat-workspace-router.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layer:reference-data",
+      "name": "참조 데이터 레이어",
+      "description": "스킬이 Excel 입력·검증 시 조회하는 PO 필드 매핑, Xview(HK) 매핑, OOR 컬럼 매핑, 커미션 요율표 등의 lookup 테이블",
+      "nodeIds": [
+        "document:references/column-map.md",
+        "document:references/field-mapping.md",
+        "document:references/rate-tables.md",
+        "document:references/xview-mapping.md"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "플러그인 설정 및 실행 레이어",
+      "description": "플러그인 메타데이터·마켓플레이스 manifest, package.json 버전 정보와 tmux 멀티탭 팀 실행 스크립트로 구성된 패키징·배포·실행 진입점",
+      "nodeIds": [
+        "config:.claude-plugin/marketplace.json",
+        "config:.claude-plugin/plugin.json",
+        "config:package.json",
+        "file:scripts/kostat-team.sh"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "문서 레이어",
+      "description": "설치·사용법, 작업 규칙, 커넥터 안내와 Dynamic Workflow 프롬프트, Eval 테스트 케이스, Trace Schema, Managed Agent 설계·리뷰, 패키징 설계, Make.com 자동화 가이드 등 설계 문서",
+      "nodeIds": [
+        "document:CLAUDE.md",
+        "document:CONNECTORS.md",
+        "document:README.md",
+        "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+        "document:docs/03. kostat-po-update Eval 테스트 케이스.md",
+        "document:docs/04. kostat-eod-retrospective Eval 테스트 케이스.md",
+        "document:docs/05. KOSTAT-AGENT Trace Schema.md",
+        "document:docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+        "document:docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+        "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+        "document:docs/09. Make.com + Claude 자동화 구현 가이드.md",
+        "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md"
+      ],
+      "containerLabels": [
+        {
+          "name": "프로젝트 개요·규칙",
+          "nodeIds": [
+            "document:CLAUDE.md",
+            "document:README.md",
+            "document:CONNECTORS.md"
+          ]
+        },
+        {
+          "name": "프롬프트·Eval 가이드",
+          "nodeIds": [
+            "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+            "document:docs/03. kostat-po-update Eval 테스트 케이스.md",
+            "document:docs/04. kostat-eod-retrospective Eval 테스트 케이스.md"
+          ]
+        },
+        {
+          "name": "Managed Agent 아키텍처",
+          "nodeIds": [
+            "document:docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+            "document:docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md"
+          ]
+        },
+        {
+          "name": "Plugin·Trace 명세",
+          "nodeIds": [
+            "document:docs/05. KOSTAT-AGENT Trace Schema.md",
+            "document:docs/08. KOSTAT Plugin 패키징 설계.md"
+          ]
+        },
+        {
+          "name": "Make.com 자동화",
+          "nodeIds": [
+            "document:docs/09. Make.com + Claude 자동화 구현 가이드.md",
+            "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md"
+          ]
+        }
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "프로젝트 개요",
+      "description": "README.md는 이 플러그인이 KOSTAT 해외영업 업무(PO 입력, OOR 분석, 커미션 인보이스, EOD 회고, 아침 브리핑)를 자동화하는 Claude Code Plugin임을 소개하고, 11개 스킬과 Hook 스크립트, 커넥터, 설치 방법을 한눈에 보여줍니다. CLAUDE.md는 디렉토리 구조, 소스와 설치 캐시의 구분, Windows 호환을 위한 `python` 호출 규칙 등 이 저장소를 수정할 때 지켜야 할 작업 규칙을 정의합니다. 두 문서를 먼저 읽으면 이후 투어에서 만날 스킬·Hook·설정 파일의 지도를 얻을 수 있습니다.",
+      "nodeIds": [
+        "document:README.md",
+        "document:CLAUDE.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "플러그인 매니페스트와 배포",
+      "description": "plugin.json은 Claude Code가 이 플러그인을 인식하는 진입점으로, 메타데이터를 선언하고 hooks.json과 각 스킬의 SKILL.md를 연결합니다. marketplace.json은 단일 플러그인 marketplace로 배포하기 위한 manifest이고, package.json은 버전과 npm scripts를 관리합니다. 세 파일의 버전 표기(plugin.json 1.0.0, package.json 1.4.0)가 서로 다르므로 semantic versioning 규칙에 따라 동기화가 필요한 지점이기도 합니다.",
+      "nodeIds": [
+        "config:.claude-plugin/plugin.json",
+        "config:.claude-plugin/marketplace.json",
+        "config:package.json"
+      ],
+      "languageLesson": "Claude Code Plugin은 `.claude-plugin/plugin.json` manifest를 기준으로 skills/와 hooks/ 디렉토리를 읽어 들입니다. 즉 코드가 아니라 선언적 JSON 설정이 플러그인의 '진입점' 역할을 합니다."
+    },
+    {
+      "order": 3,
+      "title": "Level 7 Orchestrator",
+      "description": "plugin.json이 등록한 스킬 중 최상위는 kostat-orchestrator입니다. 트리거를 감지해 우선순위에 따라 PO/OOR/커미션/EOD 에이전트팀을 병렬 소집하고 결과를 취합해 EOD로 전달하며, 하위 스킬 대부분에 의존합니다. kostat-team.sh는 같은 구조를 tmux 세션의 orchestrator·po-agent·oor-agent·validator 4개 창으로 띄워 실제 멀티 에이전트 실행 환경을 만들어 줍니다.",
+      "nodeIds": [
+        "document:skills/kostat-orchestrator/SKILL.md",
+        "file:scripts/kostat-team.sh"
+      ],
+      "languageLesson": "SKILL.md는 YAML frontmatter(name, description)와 Markdown 본문으로 구성된 프롬프트 문서입니다. description에 적힌 트리거 문구가 Claude가 스킬을 자동 선택하는 기준이 됩니다."
+    },
+    {
+      "order": 4,
+      "title": "PO 업데이트 Fan-out",
+      "description": "Orchestrator가 가장 많이 호출하는 작업은 PO 처리입니다. kostat-po-update는 PO PDF를 Excel 입력·한국어 요약·Calendar 납기 등록의 3way 병렬 Task로 나누고, 저장 전 Human-in-the-loop 승인 Gate를 둡니다. kostat-hk-po-update는 같은 패턴을 HK PO용 2way Fan-out으로 줄여 Synchronization Barrier에서 결과를 합칩니다. 두 스킬은 각각 field-mapping.md와 xview-mapping.md의 PDF 필드-Excel 컬럼 매핑을 참조합니다.",
+      "nodeIds": [
+        "document:skills/kostat-po-update/SKILL.md",
+        "document:references/field-mapping.md",
+        "document:skills/kostat-hk-po-update/SKILL.md",
+        "document:references/xview-mapping.md"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "OOR 주간 리포트",
+      "description": "kostat-oor-weekly는 매주 받는 OOR 파일에서 Bring Forward 항목 추출·Excel 업데이트와 PO# 불일치 검증 리포트를 2way 병렬로 수행합니다. column-map.md는 F/AS열(PO#), H/AU열(Ship/Req Date) 검증 컬럼 매핑과 Bring Forward 분류 규칙을 담고 있어, 앞 단계 PO 스킬과 마찬가지로 '스킬 + 참조 테이블' 분리 구조를 보여줍니다.",
+      "nodeIds": [
+        "document:skills/kostat-oor-weekly/SKILL.md",
+        "document:references/column-map.md"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "커미션 Gen/Eval Loop",
+      "description": "kostat-commission-invoice는 Fan-out 대신 Generator/Evaluator Loop 패턴을 사용합니다. Generator가 인보이스를 만들면 독립 검증 에이전트가 교차 검증하고, 통과할 때까지 반복(Loop-until-done)하며 standalone 순차 모드도 지원합니다. rate-tables.md는 요율 역산 공식, 허용 오차, US/ATP/MICRON 시트별 고객사 매핑을 정의해 검증 기준을 제공합니다.",
+      "nodeIds": [
+        "document:skills/kostat-commission-invoice/SKILL.md",
+        "document:references/rate-tables.md"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "컨텍스트와 판단 기준 스킬",
+      "description": "업무 스킬들이 올바르게 판단하려면 배경 지식이 필요합니다. kostat-memory-loader는 세션 시작 시 KOSTAT_MEMORY.md와 CLAUDE.md를 로드해 사용자 프로필·파일 경로·고객사 컨텍스트를 주입하고, kostat-tal은 MFG SITE 매핑과 고객사별 특이사항 같은 암묵적 판단 규칙을 명문화합니다. kostat-morning-briefing은 이를 바탕으로 Gmail 분류와 오늘 우선순위 브리핑을 출력하며, CONNECTORS.md는 이 스킬들이 쓰는 Gmail·Calendar·Notion·KakaoTalk·Telegram 연동을 정리합니다.",
+      "nodeIds": [
+        "document:skills/kostat-memory-loader/SKILL.md",
+        "document:skills/kostat-tal/SKILL.md",
+        "document:skills/kostat-morning-briefing/SKILL.md",
+        "document:CONNECTORS.md"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "EOD 회고와 학습 루프",
+      "description": "하루의 끝에는 kostat-eod-retrospective가 KPT 구조화와 Lessons Learned 수집을 2way 병렬로 실행하고 내일의 First Action을 취합합니다. 회고에서 나온 학습은 kostat-memory-ticket이 구조화된 Memory Ticket(JSON)으로 발행해 다음 날 memory-loader가 활용할 수 있게 하며, kostat-skill-check는 스킬 Lifecycle(candidate→trial→promoted→deprecated)을 관리합니다. 이 세 스킬이 플러그인의 자기 개선 루프를 이룹니다.",
+      "nodeIds": [
+        "document:skills/kostat-eod-retrospective/SKILL.md",
+        "document:skills/kostat-memory-ticket/SKILL.md",
+        "document:skills/kostat-skill-check/SKILL.md"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Hook 등록 설정",
+      "description": "스킬이 '무엇을 할지'를 정의한다면 hooks.json은 '언제 자동으로 개입할지'를 정의합니다. PreToolUse(Write|Edit), PostToolUse(Write|Edit), SessionStart, Stop 이벤트별로 Python hook 스크립트를 `python \"...\"` 형식으로 등록하며, 이는 CLAUDE.md의 Windows 호환 규칙을 따른 것입니다. 이후 세 단계에서 이 파일이 실행하는 스크립트들을 목적별로 살펴봅니다.",
+      "nodeIds": [
+        "config:hooks/hooks.json"
+      ],
+      "languageLesson": "Claude Code hook은 이벤트(matcher 포함)마다 command를 실행하고, 스크립트는 stdin으로 JSON 이벤트를 받아 stdout JSON(예: permissionDecision deny, additionalContext)으로 동작을 제어합니다."
+    },
+    {
+      "order": 10,
+      "title": "Excel 안전장치 Hook",
+      "description": "PO·OOR·커미션 스킬은 모두 Excel을 수정하므로 PreToolUse 단계의 안전장치가 중요합니다. kostat-gateguard.py는 세션 내 Excel 파일 최초 수정 시 시트·PO#·중복 확인 등 근거 제시를 요구하며 deny를 반환하는 Human Gate이고, kostat-autobackup.py는 Write/Edit 직전 날짜 접미사가 붙은 백업 사본을 만듭니다. 4단계에서 본 PO 스킬의 승인 Gate를 Hook 레벨에서 강제하는 구조입니다.",
+      "nodeIds": [
+        "file:hooks/kostat-gateguard.py",
+        "file:hooks/kostat-autobackup.py"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "EOD 감지 Hook 체인",
+      "description": "8단계의 EOD 회고가 빠지지 않도록 세 개의 hook이 flag 파일로 연결된 체인을 이룹니다. kostat-eod-detector.py가 사용자 메시지에서 업무종료 의도를 감지해 flag를 남기면, kostat-eod-stop.py가 세션 종료 시 회고 미완료 여부를 확인해 pending_retro flag를 기록하고, kostat-eod-sessionstart.py가 오후 6시 이후 재접속 시 회고를 제안합니다. 프로세스 간 상태를 파일로 주고받는 단순하지만 견고한 설계입니다.",
+      "nodeIds": [
+        "file:hooks/kostat-eod-detector.py",
+        "file:hooks/kostat-eod-stop.py",
+        "file:hooks/kostat-eod-sessionstart.py"
+      ],
+      "languageLesson": "각 hook은 독립된 Python 프로세스로 실행되어 메모리를 공유할 수 없으므로, flag 파일이나 JSON 파일을 통한 상태 전달이 일반적인 패턴입니다."
+    },
+    {
+      "order": 12,
+      "title": "관측과 트레이스 로깅",
+      "description": "PostToolUse 단계에서는 작업 기록이 남습니다. kostat-tracelogger.py는 감시 대상 파일의 Write/Edit를 추정 스킬명·세션 ID와 함께 JSON Lines 트레이스로 기록하고, kostat-observe.py는 Excel·커미션·OOR 관련 변경을 에이전트 라벨과 함께 wiki.md에 누적합니다. Trace Schema 문서는 이 로그를 Notion Database로 옮기기 위한 속성 정의와 샘플 레코드를 제공합니다.",
+      "nodeIds": [
+        "file:hooks/kostat-tracelogger.py",
+        "file:hooks/kostat-observe.py",
+        "document:docs/05. KOSTAT-AGENT Trace Schema.md"
+      ]
+    },
+    {
+      "order": 13,
+      "title": "에이전트 상태 공유와 라우팅",
+      "description": "3단계 Orchestrator의 멀티 에이전트 협업은 .ai-bridge/ 디렉토리를 통해 이뤄집니다. kostat-ai-bridge.py가 SessionStart/Stop에서 current-plan·task-status 등 공유 파일을 초기화·마무리하고, kostat-handoff-writer.py는 스킬 산출물 Write 시 핸드오프 문서와 task 상태를 갱신합니다. kostat-workspace-router.py는 프롬프트 키워드로 적합한 workspace와 스킬을 안내하고 compact 컨텍스트를 주입하며, kostat-compact.py는 /compact 직전 상태를 기록합니다. 이 중 workspace-router와 compact는 현재 hooks.json에 등록되어 있지 않은 점에 유의하세요.",
+      "nodeIds": [
+        "file:hooks/kostat-ai-bridge.py",
+        "file:hooks/kostat-handoff-writer.py",
+        "file:hooks/kostat-workspace-router.py",
+        "file:hooks/kostat-compact.py"
+      ]
+    },
+    {
+      "order": 14,
+      "title": "패키징 설계와 Eval",
+      "description": "지금까지 본 구조의 설계 근거는 docs/08 패키징 설계 문서에 모여 있습니다. 분산된 스킬과 Hook을 plugin.json·hooks.json 기반 플러그인으로 묶는 방법을 설명하며, CLAUDE.md는 주요 변경 시 이 문서를 함께 갱신하도록 규정합니다. docs/01은 Fan-out·Adversarial Verification 등 스킬에 쓰인 Dynamic Workflow 프롬프트를, docs/03·04는 PO 업데이트와 EOD 회고 스킬의 Eval 테스트 케이스를 정의해 품질 검증 기준을 제공합니다.",
+      "nodeIds": [
+        "document:docs/08. KOSTAT Plugin 패키징 설계.md",
+        "document:docs/01. Dynamic Workflow 실전 프롬프트.md",
+        "document:docs/03. kostat-po-update Eval 테스트 케이스.md",
+        "document:docs/04. kostat-eod-retrospective Eval 테스트 케이스.md"
+      ]
+    },
+    {
+      "order": 15,
+      "title": "향후 확장 방향",
+      "description": "마지막으로 플러그인을 넘어선 확장 설계를 살펴봅니다. docs/06은 Claude Managed Agent 기반 전담 에이전트 Console 설계를, docs/07은 그 아키텍처를 System Prompt→MCP→SDK 흐름 전반에서 검토한 리뷰를 담고 있습니다. docs/09·10은 Make.com HTTP 모듈로 Claude API를 연결하는 가이드와, 이를 고객사 뉴스 모니터링·PO 상태 알림·OOR 주간 작업 등 KOSTAT 업무에 보완 도입하는 방안을 다룹니다.",
+      "nodeIds": [
+        "document:docs/06. KOSTAT Managed Agent Console 설계 v1.0.md",
+        "document:docs/07. KOSTAT Managed Agent 아키텍처 리뷰.md",
+        "document:docs/09. Make.com + Claude 자동화 구현 가이드.md",
+        "document:docs/10. Make.com + Claude KOSTAT 업무 적용 방안.md"
+      ]
+    }
+  ]
+}
