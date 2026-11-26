@@ -60,7 +60,7 @@ description: "커미션 인보이스 생성 및 검증. 트리거: '커미션', 
    - `rate = commission_amount / sales_amount`
 4. **인보이스 초안 생성** — 고객사·기간별로 구분
 
-> 상세 인보이스 포맷·JSON 구조·검증 출력 형식: [references/rate-tables.md](references/rate-tables.md)
+> 상세 인보이스 포맷·JSON 구조·검증 출력 형식: [references/rate-tables.md](../../references/rate-tables.md)
 
 ---
 
@@ -74,7 +74,7 @@ description: "커미션 인보이스 생성 및 검증. 트리거: '커미션', 
 3. **통화 표기 검증** (USD 일관성, 천단위 구분자 일관성)
 4. **데이터 무결성 검증** (RAW DATA 행 수 vs 인보이스 반영 건수 일치)
 
-> 상세 검증 출력 JSON 구조: [references/rate-tables.md](references/rate-tables.md)
+> 상세 검증 출력 JSON 구조: [references/rate-tables.md](../../references/rate-tables.md)
 
 ---
 
@@ -117,7 +117,7 @@ while loop_count < MAX_LOOP:
 - 인보이스 저장 및 Telegram 알림
 - RAW DATA와 함께 PDF 변환 (옵션)
 
-> 상세 저장 경로·Telegram 포맷: [references/rate-tables.md](references/rate-tables.md)
+> 상세 저장 경로·Telegram 포맷: [references/rate-tables.md](../../references/rate-tables.md)
 
 ---
 
@@ -142,4 +142,4 @@ while loop_count < MAX_LOOP:
 2. Generator와 Evaluator는 **반드시 독립 컨텍스트**에서 실행
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
-> 상세 검증 체크리스트: [references/rate-tables.md](references/rate-tables.md)
+> 상세 검증 체크리스트: [references/rate-tables.md](../../references/rate-tables.md)

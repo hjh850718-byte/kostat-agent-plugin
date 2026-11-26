@@ -55,7 +55,7 @@ Excel  한글  Calendar
 
 **출력**: `{po_number, customer, qty, ship_date, kostat_pn, status: "ok" | "dup" | "error"}`
 
-> 상세 대상 파일 경로·필드 매핑·MFG SITE 규칙: [references/field-mapping.md](references/field-mapping.md)
+> 상세 대상 파일 경로·필드 매핑·MFG SITE 규칙: [references/field-mapping.md](../../references/field-mapping.md)
 
 ---
 
@@ -86,7 +86,7 @@ Excel  한글  Calendar
 
 **출력**: `{event_id, event_url, calendar_name, status: "created" | "skipped" | "error"}`
 
-> 상세 일정 포맷·필드 매핑: [references/field-mapping.md](references/field-mapping.md)
+> 상세 일정 포맷·필드 매핑: [references/field-mapping.md](../../references/field-mapping.md)
 
 ---
 
@@ -99,7 +99,7 @@ Excel  한글  Calendar
 - 재시도 실패 → Telegram 에러 알림 + 수동 처리 권장
 - 2개 이상 실패 → Orchestrator에 에러 보고 → 전체 중단
 
-> 상세 Telegram 포맷: [references/field-mapping.md](references/field-mapping.md)
+> 상세 Telegram 포맷: [references/field-mapping.md](../../references/field-mapping.md)
 
 ---
 
@@ -125,4 +125,4 @@ Excel  한글  Calendar
 2. **Fan-out 모드**: 3개 Task는 서로 독립적 — 컨텍스트 공유 금지
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
-> 상세 검증 체크리스트·주의사항: [references/field-mapping.md](references/field-mapping.md)
+> 상세 검증 체크리스트·주의사항: [references/field-mapping.md](../../references/field-mapping.md)

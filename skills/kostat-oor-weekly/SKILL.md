@@ -54,7 +54,7 @@ Excel       검증 리포트
 3. **Excel 업데이트**: 각 행에 그룹별 컬러코딩 + Bring Forward 사유 요약 컬럼 추가
 4. **저장**: 원본 백업 후 결과 저장
 
-> 상세 컬럼 매핑(F/AS/H/AU)·컬러코딩 규칙·검증 리포트 포맷: [references/column-map.md](references/column-map.md)
+> 상세 컬럼 매핑(F/AS/H/AU)·컬러코딩 규칙·검증 리포트 포맷: [references/column-map.md](../../references/column-map.md)
 
 ---
 
@@ -69,7 +69,7 @@ Excel       검증 리포트
 4. **항목별 심각도 판단**: Critical(PO# 불일치) / Warning(납기 7일 초과) / Info(납기 7일 이내)
 5. **리포트 생성**
 
-> 상세 컬럼 매핑·심각도 기준·리포트 포맷·Telegram 알림: [references/column-map.md](references/column-map.md)
+> 상세 컬럼 매핑·심각도 기준·리포트 포맷·Telegram 알림: [references/column-map.md](../../references/column-map.md)
 
 ---
 
@@ -81,7 +81,7 @@ Excel       검증 리포트
 - 1개 Task 실패 → 완료된 쪽 저장 + 실패 쪽 재시도 1회
 - 재시도 실패 → 수동 처리 권장 메시지 + 실패 내역 포함하여 발송
 
-> 상세 Telegram 포맷: [references/column-map.md](references/column-map.md)
+> 상세 Telegram 포맷: [references/column-map.md](../../references/column-map.md)
 
 ---
 
@@ -100,4 +100,4 @@ Excel       검증 리포트
 2. 재검증 시 이전과 다른 각도에서 검증 (동일 실수 반복 방지)
 3. 3회 초과 실패 → 사용자에게 상황 보고 후 에스컬레이션
 
-> 상세 검증 체크리스트: [references/column-map.md](references/column-map.md)
+> 상세 검증 체크리스트: [references/column-map.md](../../references/column-map.md)
