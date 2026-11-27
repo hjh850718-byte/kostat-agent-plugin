@@ -51,7 +51,11 @@ def check_eod_done_today() -> bool:
     if LOG_PATH.exists():
         try:
             content = LOG_PATH.read_text(encoding="utf-8")
-            return f"EOD 감지 ({today}" in content
+            # 로그 형식: "[YYYY-MM-DD HH:MM:SS] ... EOD 감지 (trigger) ..."
+            return any(
+                line.startswith(f"[{today}") and "EOD 감지" in line
+                for line in content.splitlines()
+            )
         except Exception:
             pass
     return False
